@@ -65,7 +65,8 @@ export const listKeys = async () => {
 };
 
 export const sendTransaction = async ({ sendingMode, transaction, publicKey }) => {
-  return await window.ethereum.request({
+    console.log("sommething")
+    return await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
       snapId: defaultSnapOrigin,

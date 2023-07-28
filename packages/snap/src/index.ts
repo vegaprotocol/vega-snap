@@ -1,13 +1,13 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
-import { panel, text } from '@metamask/snaps-ui';
 import rpc from "./node-rpc";
+import * as txs from "./transaction";
+
+import { vega } from '@vegaprotocol/protos'
+// import * as InputData from '@vegaprotocol/protos/dist/vega/commands/v1/InputData/encode'
+// import * as Transaction from '@vegaprotocol/protos/dist/vega/commands/v1/Transaction/encode'
+// import { TX_VERSION_V3 } from '@vegaprotocol/protos/dist/vega/commands/v1/TxVersion'
 
 import { KeyPair } from '@vegaprotocol/crypto/cjs/keypair.cjs'
-import * as InputData from '@vegaprotocol/protos/dist/vega/commands/v1/InputData/encode'
-import * as Transaction from '@vegaprotocol/protos/dist/vega/commands/v1/Transaction/encode'
-import { TX_VERSION_V3 } from '@vegaprotocol/protos/dist/vega/commands/v1/TxVersion'
-import { toBase64, toHex } from '@vegaprotocol/crypto/cjs/buf.cjs'
-import { randomFill } from '@vegaprotocol/crypto/cjs/crypto.cjs'
 
 const networks = new Map([
   ['Mainnet', {
@@ -28,18 +28,8 @@ const networks = new Map([
   }]
 ])
 
-const DEFAULT_NETWORK = 'Mainnet'
+const DEFAULT_NETWORK = 'Fairground'
 
-/**
- * Handle incoming JSON-RPC requests, sent through `wallet_invokeSnap`.
- *
- * @param args - The request handler args as object.
- * @param args.origin - The origin of the request, e.g., the website that
- * invoked the snap.
- * @param args.request - A validated JSON-RPC request object.
- * @returns The result of `snap_dialog`.
- * @throws If the request method is not valid for this snap.
- */
 export const onRpcRequest: OnRpcRequestHandler = async ({ origin, request }) => {
   switch (request.method) {
     case 'client.list_keys':
@@ -58,19 +48,37 @@ export const onRpcRequest: OnRpcRequestHandler = async ({ origin, request }) => 
       }
 
     case 'client.get_chain_id':
-      const node = await rpc.findHealthyNode(networks.get(DEFAULT_NETWORK).rest.map(u => new URL(u)))
+      var node = await rpc.findHealthyNode(networks.get(DEFAULT_NETWORK).rest.map(u => new URL(u)))
       const res = await node.blockchainHeight()
 
       return { chainID: res.chainId }
 
     case 'client.send_transaction':
-      const { sendingMode, transaction, publicKey } = request.params
-      // TODO write logic to encode and POW and all that
-      return
+	  const { publicKey, sendingMode, transaction } = request.params
+	  if (sendingMode != 'TYPE_SYNC' && sendingMode != 'TYPE_ASYNC') {
+	      throw new Error('Not a valid sending mode.')
+	  }
+
+	  var proceed = await txs.review(origin, transaction)
+	  if (!proceed) {
+	      return serializeError('User rejected the transaction')
+	  }
+
+	  var node = await rpc.findHealthyNode(networks.get(DEFAULT_NETWORK).rest.map(u => new URL(u)))
+
+	  return txs.send(node, transaction, sendingMode)
 
     case 'client.connect_wallet':
     case 'client.disconnect_wallet':
     default:
-      throw new Error('Method not found.');
+      throw new Error('Method not found.')
   }
 };
+
+const serializeError = (msg) => {
+  return {
+    error: {
+      message: msg,
+    },
+  }
+}
