@@ -21,9 +21,7 @@ jobs:
           cache: 'yarn'
       - run: yarn install --immutable
       - run: yarn build
-      - run: |
-          git diff packages/snap/snap.manifest.json
-          yarn lint
+      - run: yarn lint:eslint
       - run: yarn test
       - name: Cache snap build
         if: ${{ matrix.node-version == '18.x' }}
