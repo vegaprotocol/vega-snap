@@ -3,10 +3,7 @@ import { KeyPair } from '@vegaprotocol/crypto/cjs/keypair.cjs';
 import { toBase64, toHex } from '@vegaprotocol/crypto/cjs/buf.cjs';
 import { randomFill } from '@vegaprotocol/crypto/cjs/crypto.cjs';
 import { solve } from '@vegaprotocol/crypto/cjs/pow.cjs';
-import {
-  InputData,
-  Transaction,
-} from '@vegaprotocol/protos/dist/vega/commands/v1';
+import { InputData, Transaction } from '@vegaprotocol/protos/vega/commands/v1';
 
 enum TransactionKeys {
   UNKNOWN = 'unknown',
