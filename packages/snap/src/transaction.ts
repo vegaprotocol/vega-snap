@@ -3,7 +3,7 @@ import { KeyPair } from '@vegaprotocol/crypto/cjs/keypair.cjs';
 import { toBase64, toHex } from '@vegaprotocol/crypto/cjs/buf.cjs';
 import { randomFill } from '@vegaprotocol/crypto/cjs/crypto.cjs';
 import { solve } from '@vegaprotocol/crypto/cjs/pow.cjs';
-import { vega } from '@vegaprotocol/protos';
+// import { vega } from '@vegaprotocol/protos';
 
 enum TransactionKeys {
   UNKNOWN = 'unknown',
@@ -99,7 +99,7 @@ export const send = async (node, transaction, sendingMode) => {
   ).getBigUint64(0, false);
 
   // TODO(): remove for the real stuff...
-  const inputData = new Buffer('inputData');
+  const inputData = Buffer.from('inputData');
   // const inputData = vega.commands.v1.InputData.encode({
   //   blockHeight: BigInt(latestBlock.height),
   //   nonce,
@@ -121,7 +121,7 @@ export const send = async (node, transaction, sendingMode) => {
   };
 
   // TODO(): remove for the real stuff
-  const tx = new Buffer('tx');
+  const tx = Buffer.from('tx');
   // const tx = Transaction.encode(txData)
 
   const txJSON = {
