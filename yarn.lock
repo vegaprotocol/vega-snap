@@ -4682,7 +4682,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": ^5.33.0
     "@typescript-eslint/parser": ^5.33.0
     "@vegaprotocol/crypto": ^0.11.0
-    "@vegaprotocol/protos": ^0.6.0
+    "@vegaprotocol/protos": "vegaprotocol/js-protos#feat/cjs"
     eslint: ^8.21.0
     eslint-config-prettier: ^8.1.0
     eslint-plugin-import: ^2.26.0
@@ -6942,13 +6942,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vegaprotocol/protos@npm:^0.6.0":
+"@vegaprotocol/protos@vegaprotocol/js-protos#feat/cjs":
   version: 0.6.0
-  resolution: "@vegaprotocol/protos@npm:0.6.0"
+  resolution: "@vegaprotocol/protos@https://github.com/vegaprotocol/js-protos.git#commit=fe08140db109683fd3f09aae1257246d09375999"
   dependencies:
-    protobuf-codec: ^1.0.6
+    protobuf-codec: ^2.0.0
     type-fest: ^3.6.0
-  checksum: 2f84e126b51b0fc5d369ba09a2c2f6eb8da5a861ec80c52a5d885248398df9cb3c84cb2f5fde8bca0578d1bfd915f33b773471c593ae6918f65764ded3393e55
+  checksum: 960935de83a83e89eadd98812c78e2981e498f7fd4f4cca0a4d70a60359d75ea8f60ab6b3f87e5498370c61d78a936aedbd244c2a3ed366363d1edc079268318
   languageName: node
   linkType: hard
 
@@ -18489,12 +18489,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"protobuf-codec@npm:^1.0.6":
-  version: 1.0.6
-  resolution: "protobuf-codec@npm:1.0.6"
+"protobuf-codec@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "protobuf-codec@npm:2.0.0"
   dependencies:
     nanoassert: ^2.0.0
-  checksum: e1a37c38d966e6227bf49dd306ad75ca5a116e0f1e01ef9f31c7da67fc40921ca22a884a6185ad950ef84d2ee13763f563ea004484192b73825172efd3263f98
+  checksum: 4d0ccd7d56cf960aa5b0ddbaba312f37af09cb7ccb82c1cc41767c425a36e3957d38adbfade1530f8e7f5c6ffd964b9d98230890e212c4d37f1f9c4622b8e312
   languageName: node
   linkType: hard
 
