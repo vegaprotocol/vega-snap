@@ -56,20 +56,41 @@ const TRANSACTION_TITLES: Record<TransactionKeys, string> = {
     'Ethereum key rotation submission',
 };
 
+const prettyPrintRec = async (things, obj, tab) => {
+  for (const propt in obj) {
+    if (typeof obj[propt] === 'object') {
+      things.push(text(`${tab}**${propt}**:`));
+      prettyPrintRec(things, obj[propt], `${tab}`);
+    } else {
+      things.push(text(`${tab}**${propt}**: ${obj[propt]}`));
+    }
+  }
+};
+
+const prettyPrint = async (things, obj, tab) => {
+  for (const propt in obj) {
+    prettyPrintRec(things, obj[propt], tab);
+  }
+};
+
 export const review = async (origin, transaction) => {
   const header =
     TRANSACTION_TITLES[Object.keys(transaction)[0] as TransactionKeys];
+
+  const things = [];
+  things.push(heading(`${header}`));
+  things.push(text(`Request from: **${origin}**`));
+  things.push(divider());
+  await prettyPrint(things, transaction, '');
+  things.push(divider());
+  things.push(text(`Raw transaction:`));
+  things.push(copyable(`${JSON.stringify(transaction, null, 2)}`));
 
   return snap.request({
     method: 'snap_dialog',
     params: {
       type: 'confirmation',
-      content: panel([
-        heading(`${header}`),
-        text(`Request from: **${origin}**`),
-        divider(),
-        copyable(`${JSON.stringify(transaction, null, 2)}`),
-      ]),
+      content: panel(things),
     },
   });
 };
