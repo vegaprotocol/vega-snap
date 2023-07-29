@@ -55,7 +55,7 @@ export default class NodeRPC {
         Accept: 'application/json',
         'Content-Type': 'application/json'
       },
-      body
+      body: JSON.stringify(body)
     })
 
     if (!res.ok) {

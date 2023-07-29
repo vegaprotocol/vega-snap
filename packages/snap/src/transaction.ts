@@ -138,11 +138,32 @@ export const send = async (node, transaction, sendingMode) => {
   };
 
   const sentAt = new Date().toISOString();
-  const res = await node.submitRawTransaction(toBase64(tx), sendingMode);
+  const hexTx = toBase64(tx);
+  const res = await node.submitRawTransaction(hexTx, sendingMode);
 
   return {
     sentAt,
     transactionHash: res.txHash,
     transaction: txJSON,
   };
+};
+
+export const debug = async (_data) => {
+  return snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'alert',
+      content: panel([copyable(`${JSON.stringify(_data)}`)]),
+    },
+  });
+};
+
+export const debugString = async (data) => {
+  return snap.request({
+    method: 'snap_dialog',
+    params: {
+      type: 'alert',
+      content: panel([copyable(`${data}`)]),
+    },
+  });
 };

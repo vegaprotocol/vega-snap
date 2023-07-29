@@ -172,7 +172,7 @@ const Index = () => {
           }))),
       })
     } catch (e) {
-      console.error(e);
+	console.error(JSON.stringify(e));
       dispatch({ type: MetamaskActions.SetError, payload: e });
     }
   };
