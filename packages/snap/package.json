@@ -30,6 +30,7 @@
     "@metamask/snaps-types": "^0.32.2",
     "@metamask/snaps-ui": "^0.32.2",
     "@vegaprotocol/crypto": "^0.11.0",
+    "@vegaprotocol/protos": "vegaprotocol/js-protos#feat/cjs",
     "buffer": "^6.0.3"
   },
   "devDependencies": {
