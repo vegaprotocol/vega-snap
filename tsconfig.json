@@ -11,9 +11,5 @@
     "target": "ES2017",
     "allowJs": true
   },
-  "exclude": [
-    "**/__snapshots__/**",
-    "**/test/**",
-    "**/*.test.ts"
-  ]
+  "exclude": ["**/__snapshots__/**", "**/test/**", "**/*.test.ts"]
 }

@@ -7,14 +7,14 @@ module.exports = {
     sourceMaps: true,
   },
   bundlerCustomizer: (bundler) => {
-    bundler.transform(function() {
+    bundler.transform(function () {
       let data = '';
       return through(
-        function(buffer, _encoding, callback) {
+        function (buffer, _encoding, callback) {
           data += buffer;
           callback();
         },
-        function(callback) {
+        function (callback) {
           this.push("globalThis.Buffer = require('buffer/').Buffer;");
           this.push(data);
           callback();

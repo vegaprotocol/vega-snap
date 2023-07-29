@@ -51,21 +51,32 @@ export const getSnap = async (version?: string): Promise<Snap | undefined> => {
 };
 
 export const getChainId = async () => {
-  return await window.ethereum.request({
+  return (await window.ethereum.request({
     method: 'wallet_invokeSnap',
-    params: { snapId: defaultSnapOrigin, request: { method: 'client.get_chain_id' } },
-  }) as Promise<{ chainID: string }>;
+    params: {
+      snapId: defaultSnapOrigin,
+      request: { method: 'client.get_chain_id' },
+    },
+  })) as Promise<{ chainID: string }>;
 };
 
 export const listKeys = async () => {
-  return await window.ethereum.request({
+  return (await window.ethereum.request({
     method: 'wallet_invokeSnap',
-    params: { snapId: defaultSnapOrigin, request: { method: 'client.list_keys' } },
-  }) as Promise<{ keys: { name: string; publicKey: string }[] }>;
+    params: {
+      snapId: defaultSnapOrigin,
+      request: { method: 'client.list_keys' },
+    },
+  })) as Promise<{ keys: { name: string; publicKey: string }[] }>;
 };
 
-export const sendTransaction = async ({ sendingMode, transaction, publicKey }) => {
-  return await window.ethereum.request({
+export const sendTransaction = async ({
+  sendingMode,
+  transaction,
+  publicKey,
+}) => {
+  console.log('sommething');
+  return (await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {
       snapId: defaultSnapOrigin,
@@ -78,7 +89,7 @@ export const sendTransaction = async ({ sendingMode, transaction, publicKey }) =
         },
       },
     },
-  }) as Promise<{ transactionHash: string, transaction: any }>;
+  })) as Promise<{ transactionHash: string; transaction: any }>;
 };
 
 export const isLocalSnap = (snapId: string) => snapId.startsWith('local:');

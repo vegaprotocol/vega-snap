@@ -1,17 +1,17 @@
 {
   "version": "0.1.0",
-  "description": "An example Snap written in TypeScript.",
-  "proposedName": "TypeScript Example Snap",
+  "description": "Vega Metamask Snap that adds Vega support for Metamask",
+  "proposedName": "Vega Snap",
   "repository": {
     "type": "git",
     "url": "https://github.com/MetaMask/template-snap-monorepo.git"
   },
   "source": {
-    "shasum": "woyKwWsDhNmvr/BTRX/u6HciLJOM7r4XIHYPF4niv1U=",
+    "shasum": "UVwhszKA0v0Og3TPvTep25swp/UY2WEpcS9TEOyQv64=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
-        "iconPath": "images/icon.svg",
+        "iconPath": "images/vega.svg",
         "packageName": "snap",
         "registry": "https://registry.npmjs.org/"
       }

@@ -1,5 +1,5 @@
-import assert from 'nanoassert'
-import { hex as fromHex, toString } from '@vegaprotocol/crypto/cjs/buf.cjs'
+import assert from 'nanoassert';
+import { hex as fromHex, toString } from '@vegaprotocol/crypto/cjs/buf.cjs';
 
 export default class NodeRPC {
   /**
@@ -55,7 +55,7 @@ export default class NodeRPC {
         Accept: 'application/json',
         'Content-Type': 'application/json'
       },
-      body
+      body: JSON.stringify(body)
     })
 
     if (!res.ok) {
