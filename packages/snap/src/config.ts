@@ -1,4 +1,4 @@
-export const networks = new Map([
+export const NETWORKS = new Map([
   [
     'Mainnet',
     {
@@ -24,11 +24,3 @@ export const networks = new Map([
 ]);
 
 export const DEFAULT_NETWORK = 'Fairground';
-
-export const serializeError = (msg) => {
-  return {
-    error: {
-      message: msg,
-    },
-  };
-};
