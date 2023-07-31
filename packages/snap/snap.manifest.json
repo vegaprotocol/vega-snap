@@ -7,12 +7,12 @@
     "url": "https://github.com/vegaprotocol/vega-snap.git"
   },
   "source": {
-    "shasum": "hNUX5UKQzoukq3pK04zEuTgTtkJb1I2Y8LcQdlwbswI=",
+    "shasum": "6JTHzwPxQKRGzJAdNrX+duAIy3LYmD9UhrGrqGK5UNY=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
         "iconPath": "images/vega.svg",
-        "packageName": "snap",
+        "packageName": "@vegaprotocol/snap",
         "registry": "https://registry.npmjs.org/"
       }
     }
