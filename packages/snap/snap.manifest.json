@@ -1,10 +1,10 @@
 {
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "Vega Metamask Snap that adds Vega support for Metamask",
   "proposedName": "Vega Snap",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MetaMask/template-snap-monorepo.git"
+    "url": "https://github.com/vegaprotocol/vega-snap.git"
   },
   "source": {
     "shasum": "hNUX5UKQzoukq3pK04zEuTgTtkJb1I2Y8LcQdlwbswI=",
