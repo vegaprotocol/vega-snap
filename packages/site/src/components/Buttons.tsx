@@ -106,8 +106,8 @@ export const ListKeysButton = (props: ComponentProps<typeof Button>) => {
   return <Button {...props}>List keys</Button>;
 }
 
-export const SendTransferButton = (props: ComponentProps<typeof Button>) => {
-  return <Button {...props}>Send transfer</Button>;
+export const SendTransactionButton = (props: ComponentProps<typeof Button>) => {
+  return <Button {...props}>Send transaction</Button>;
 }
 
 export const HeaderButtons = ({
