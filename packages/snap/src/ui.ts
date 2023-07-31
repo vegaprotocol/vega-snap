@@ -54,8 +54,10 @@ export async function debug(obj: any) {
 }
 
 /**
+ * Indents a string to be send to a text snap-ui component.
  *
- * @param t
+ * @param t - A string to be displayed.
+ * @returns A text snap-ui component prepended with indentation.
  */
 function indentText(t: string) {
   const indent = '&nbsp;&nbsp;&nbsp;&nbsp;';
@@ -63,8 +65,10 @@ function indentText(t: string) {
 }
 
 /**
+ * Optimise the length of a Vega ID to be displayed.
  *
- * @param id
+ * @param id - An ID to be minimised.
+ * @returns A minimised Vega ID.
  */
 function minimiseId(id: string) {
   if (id.length >= 12) {
@@ -73,14 +77,39 @@ function minimiseId(id: string) {
   return id;
 }
 
+/**
+ * Formats a unix timestamps to human readable output.
+ *
+ * @param t - A unix timestamps as an integer.
+ * @returns A unix timestamps formatted into a human readable date.
+ */
 function formatTimestamp(t: any) {
-    return new Date(t*1000).toLocaleString();
+  return new Date(t * 1000).toLocaleString();
 }
 
 /**
+ * Gets a human readable version of an account type.
  *
- * @param tx
- * @param textFn
+ * @param type - The account type.
+ * @returns A human readable version of the account type.
+ */
+function getAccountType(type: string) {
+  switch (type) {
+    case 'ACCOUNT_TYPE_GLOBAL_REWARD':
+      return 'Global Reward';
+    case 'ACCOUNT_TYPE_GENERAL':
+      return 'Global Reward';
+    default:
+      throw new Error('Invalid account type');
+  }
+}
+
+/**
+ * Pretty prints a transaction depending of its type.
+ *
+ * @param tx - The transaction to be pretty printed.
+ * @param textFn - The text function to be use for rendering.
+ * @returns List of snap-ui elements.
  */
 function prettyPrintTx(tx: any, textFn: any) {
   const keys = Object.keys(tx);
@@ -101,89 +130,97 @@ function prettyPrintTx(tx: any, textFn: any) {
     case 'orderAmendment':
       return prettyPrintOrderAmendment(txContent, textFn);
     case 'withdrawSubmission':
-	  return prettyPrintWithdrawSubmission(txContent, textFn);
+      return prettyPrintWithdrawSubmission(txContent, textFn);
     case 'transfer':
-	  return prettyPrintTransferFunds(txContent, textFn);
+      return prettyPrintTransferFunds(txContent, textFn);
     default:
       return prettyPrint(txContent);
   }
 }
 
 /**
+ * Pretty prints a transfer funds transaction.
  *
- * @param tx
- * @param textFn
+ * @param tx - The transfer funds transaction.
+ * @param textFn - The text function to be used for rendering.
+ * @returns List of snap-ui elements.
  */
 function prettyPrintTransferFunds(tx: any, textFn: any) {
-    // handle only oneOff transfer, all others should be
-    // the default prettyPrint
-    if (!tx.oneOff) {
-	return prettyPrint(tx)
-    }
-
-    const elms = [
-	textFn(`**Amount**: ${tx.amount}`),
-	textFn(`**Asset ID**:`),
-	copyable(`${tx.asset}`),
-	textFn(`**To**:`),
-	copyable(`${tx.to}`),
-    ];
-
-    // we do not want to display if it's general account too.
-    if (tx.toAccountType !== undefined && tx.toAccountType !== null && tx.toAccountType !== 'ACCOUNT_TYPE_GENERAL' && tx.toAccountType !== '') {
-	elms.push(textFn(`**To Account Type**: ${getAccountType(tx.toAccountType)}`));
-    }
-
-    if (tx.reference !== undefined && tx.reference !== null && tx.reference !== '') {
-	elms.push(textFn(`**Reference**: ${tx.reference}`));
-    }
-
-    if (tx.oneOff.deliverOn !== undefined && tx.oneOff.deliverOn !== null && tx.oneOff.deliverOn !== 0) {
-	elms.push(textFn(`**Deliver On**: ${formatTimestamp(tx.oneOff.deliverOn)}`))
-    }
-
-    return elms;
-}
-
-/**
- *
- * @param tif
- */
-function getAccountType(type: string) {
-  switch (type) {
-    case 'ACCOUNT_TYPE_GLOBAL_REWARD':
-      return 'Global Reward';
-      case 'ACCOUNT_TYPE_GENERAL':
-	  return 'Global Reward';
-      default:
-	  throw new Error("Invalid account type");
+  // handle only oneOff transfer, all others should be
+  // the default prettyPrint
+  if (!tx.oneOff) {
+    return prettyPrint(tx);
   }
-}
 
-/**
- *
- * @param tx
- * @param textFn
- */
-function prettyPrintWithdrawSubmission(tx: any, textFn: any) {
-    const elms = [
-	textFn(`**Amount**: ${tx.amount}`),
-	textFn(`**Asset ID**:`),
-	copyable(`${tx.asset}`),
-    ];
+  const elms = [
+    textFn(`**Amount**: ${tx.amount}`),
+    textFn(`**Asset ID**:`),
+    copyable(`${tx.asset}`),
+    textFn(`**To**:`),
+    copyable(`${tx.to}`),
+  ];
 
-    if (tx.ext?.erc20?.receiverAddress) {
-	elms.push(textFn(`**To Address**: `));
-	elms.push(copyable(`${tx.ext?.erc20?.receiverAddress}`));
-    }
+  // we do not want to display if it's general account too.
+  if (
+    tx.toAccountType !== undefined &&
+    tx.toAccountType !== null &&
+    tx.toAccountType !== 'ACCOUNT_TYPE_GENERAL' &&
+    tx.toAccountType !== ''
+  ) {
+    elms.push(
+      textFn(`**To Account Type**: ${getAccountType(tx.toAccountType)}`),
+    );
+  }
+
+  if (
+    tx.reference !== undefined &&
+    tx.reference !== null &&
+    tx.reference !== ''
+  ) {
+    elms.push(textFn(`**Reference**: ${tx.reference}`));
+  }
+
+  if (
+    tx.oneOff.deliverOn !== undefined &&
+    tx.oneOff.deliverOn !== null &&
+    tx.oneOff.deliverOn !== 0
+  ) {
+    elms.push(
+      textFn(`**Deliver On**: ${formatTimestamp(tx.oneOff.deliverOn)}`),
+    );
+  }
 
   return elms;
 }
 
 /**
+ * Pretty prints a windrawal submission.
  *
- * @param tx
- * @param textFn
+ * @param tx - The withdrawal submission transaction.
+ * @param textFn - The text function used for rendering.
+ * @returns List of snap-ui elements.
+ */
+function prettyPrintWithdrawSubmission(tx: any, textFn: any) {
+  const elms = [
+    textFn(`**Amount**: ${tx.amount}`),
+    textFn(`**Asset ID**:`),
+    copyable(`${tx.asset}`),
+  ];
+
+  if (tx.ext?.erc20?.receiverAddress) {
+    elms.push(textFn(`**To Address**: `));
+    elms.push(copyable(`${tx.ext?.erc20?.receiverAddress}`));
+  }
+
+  return elms;
+}
+
+/**
+ * Pretty print and Order Submission.
+ *
+ * @param tx - The order submission transaction.
+ * @param textFn - The text function used for rendering.
+ * @returns List of snap-ui elements.
  */
 function prettyPrintOrderSubmission(tx: any, textFn: any) {
   const elms = [];
@@ -218,7 +255,7 @@ function prettyPrintOrderSubmission(tx: any, textFn: any) {
   elms.push(textFn(`**Market ID**: ${marketId}`));
 
   if (tx.expiresAt && tx.expiresAt > 0) {
-      elms.push(textFn(`**Expires At**: ${formatTimestamp(tx.expiresAt)}`));
+    elms.push(textFn(`**Expires At**: ${formatTimestamp(tx.expiresAt)}`));
   }
 
   if (tx.postOnly) {
@@ -230,7 +267,7 @@ function prettyPrintOrderSubmission(tx: any, textFn: any) {
   }
 
   if (tx.icebergOpts) {
-      elms.push(textFn(`**Iceberg Peak Size**: ${tx.icebergOpts.peakSize}`));
+    elms.push(textFn(`**Iceberg Peak Size**: ${tx.icebergOpts.peakSize}`));
     elms.push(
       textFn(
         `**Iceberg Minimum Visible Size**: ${tx.icebergOpts.minimumVisibleSize}`,
@@ -242,9 +279,11 @@ function prettyPrintOrderSubmission(tx: any, textFn: any) {
 }
 
 /**
+ * Pretty print an order amendment.
  *
- * @param tx
- * @param textFn
+ * @param tx - The order amendment transaction.
+ * @param textFn - The test function used for rendering.
+ * @returns List of snap-ui elements.
  */
 function prettyPrintOrderAmendment(tx: any, textFn: any) {
   const elms = [
@@ -273,7 +312,7 @@ function prettyPrintOrderAmendment(tx: any, textFn: any) {
     tx.expiresAt !== null &&
     tx.expiresAt !== 0
   ) {
-      elms.push(textFn(`**Expires At**: ${formatTimestamp(tx.expiresAt)}`));
+    elms.push(textFn(`**Expires At**: ${formatTimestamp(tx.expiresAt)}`));
   }
 
   if (
@@ -306,8 +345,10 @@ function prettyPrintOrderAmendment(tx: any, textFn: any) {
 }
 
 /**
+ * Gets a human readable string representing a pegged order reference.
  *
- * @param ref
+ * @param ref - A pegged order reference.
+ * @returns The human readable string.
  */
 function getPeggedReference(ref: string) {
   switch (ref) {
@@ -317,14 +358,16 @@ function getPeggedReference(ref: string) {
       return 'Bid';
     case 'PEGGED_REFERENCE_BEST_ASK':
       return 'Ask';
-      default:
-	  throw new Error('Unknown Pegged Reference');
+    default:
+      throw new Error('Unknown Pegged Reference');
   }
 }
 
 /**
+ * Gets a human readable string representing a time in force.
  *
- * @param tif
+ * @param tif - The time in force.
+ * @returns The human readable string.
  */
 function getTimeInForce(tif: string) {
   switch (tif) {
@@ -340,14 +383,16 @@ function getTimeInForce(tif: string) {
       return 'GFA';
     case 'TIME_IN_FORCE_GFN':
       return 'GFN';
-      default:
-	  throw new Error('Unknown Time in Force');
+    default:
+      throw new Error('Unknown Time in Force');
   }
 }
 
 /**
+ * Pretty print a batch market instructions transaction.
  *
- * @param tx
+ * @param tx - The transaction.
+ * @returns List of snap-ui elements.
  */
 function prettyPrintBatchMarketInstructions(tx: any) {
   const elms = [];
@@ -355,8 +400,8 @@ function prettyPrintBatchMarketInstructions(tx: any) {
 
   if (tx.cancellations && tx.cancellations.length > 0) {
     elms.push(text(`**Order Cancellations:**`));
-      for (const [i, c] of tx.cancellations.entries()) {
-      elms.push(text(`__${i+1}:__`));
+    for (const [i, c] of tx.cancellations.entries()) {
+      elms.push(text(`__${i + 1}:__`));
       elms.push(...prettyPrintTx({ orderCancellation: c }, indentText));
     }
     addDivider = true;
@@ -367,8 +412,8 @@ function prettyPrintBatchMarketInstructions(tx: any) {
       elms.push(divider());
     }
     elms.push(text(`**Order Amendments:**`));
-      for (const [i, c] of tx.amendments.entries()) {
-      elms.push(text(`__${i+1}:__`));
+    for (const [i, c] of tx.amendments.entries()) {
+      elms.push(text(`__${i + 1}:__`));
       elms.push(...prettyPrintTx({ orderAmendment: c }, indentText));
     }
     addDivider = true;
@@ -379,8 +424,8 @@ function prettyPrintBatchMarketInstructions(tx: any) {
       elms.push(divider());
     }
     elms.push(text(`**Order Submissions:**`));
-      for (const [i, c] of tx.submissions.entries()) {
-      elms.push(text(`__${i+1}:__`));
+    for (const [i, c] of tx.submissions.entries()) {
+      elms.push(text(`__${i + 1}:__`));
       elms.push(...prettyPrintTx({ orderSubmission: c }, indentText));
     }
   }
@@ -389,9 +434,11 @@ function prettyPrintBatchMarketInstructions(tx: any) {
 }
 
 /**
+ * Pretty print a cancel order transaction.
  *
- * @param tx
- * @param textFn
+ * @param tx - The cancel order transaction.
+ * @param textFn - The text function used for rendering.
+ * @returns List of snap-ui elements.
  */
 function prettyPrintCancelOrder(tx: any, textFn: any) {
   const hasOrderId =
