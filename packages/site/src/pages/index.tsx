@@ -16,7 +16,7 @@ import {
   Card,
   GetChainIdButton,
   ListKeysButton,
-  SendTransferButton,
+  SendTransactionButton,
 } from '../components';
 
 const Container = styled.div`
@@ -145,7 +145,7 @@ const Index = () => {
     }
   };
 
-  const handleSendTransactionClick = async () => {
+  const handleSendTransferClick = async () => {
     try {
       dispatch({
         type: MetamaskActions.SetMessage,
@@ -166,6 +166,72 @@ const Index = () => {
             }
           }
         }))),
+      })
+    } catch (e) {
+      console.error(JSON.stringify(e));
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleSendOrderClick = async () => {
+    try {
+      dispatch({
+        type: MetamaskActions.SetMessage,
+        payload: 'Transaction sent with hash: ' + JSON.stringify((await sendTransaction({
+          sendingMode: 'TYPE_SYNC',
+          publicKey: (await listKeys()).keys[0].publicKey,
+          transaction: {
+            "orderSubmission": {
+              "marketId": "3ab4fc0ea7e6eabe74133fb14ef2d8934ff21dd894ff080a09ec9a3647ceb2a4",
+              "type": "TYPE_LIMIT",
+              "side": "SIDE_BUY",
+              "timeInForce": "TIME_IN_FORCE_GTC",
+              "price": "200000000",
+              "size": "1000",
+              "postOnly": false,
+              "reduceOnly": false,
+              "icebergOpts": {
+                "peakSize": "40",
+                "minimumVisibleSize": "2"
+              }
+            }
+          }
+        })).transactionHash),
+      })
+    } catch (e) {
+      console.error(JSON.stringify(e));
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleSendCloseAllClick = async () => {
+    try {
+      dispatch({
+        type: MetamaskActions.SetMessage,
+        payload: 'Transaction sent with hash: ' + JSON.stringify((await sendTransaction({
+          sendingMode: 'TYPE_SYNC',
+          publicKey: (await listKeys()).keys[0].publicKey,
+          transaction: {
+            "batchMarketInstructions": {
+              "cancellations": [
+                {
+                  "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+                  "orderId": ""
+                }
+              ],
+              "submissions": [
+                {
+                  "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+                  "type": "TYPE_MARKET",
+                  "timeInForce": "TIME_IN_FORCE_IOC",
+                  "side": "SIDE_SELL",
+                  "size": "16000",
+                  "reduceOnly": true
+                }
+              ]
+            }
+          }
+        })).transactionHash),
       })
     } catch (e) {
       console.error(JSON.stringify(e));
@@ -258,8 +324,8 @@ const Index = () => {
             description:
               'Send a simple vega transfer.',
             button: (
-              <SendTransferButton
-                onClick={handleSendTransactionClick}
+              <SendTransactionButton
+                onClick={handleSendTransferClick}
                 disabled={!state.installedSnap}
               />
             ),
@@ -290,7 +356,44 @@ const Index = () => {
             !shouldDisplayReconnectButton(state.installedSnap)
           }
         />
-
+        <Card
+          content={{
+            title: 'Send iceberg order',
+            description:
+              'Send a GTC Iceberg order',
+            button: (
+              <SendTransactionButton
+                onClick={handleSendOrderClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'Send Console-like "Close"',
+            description:
+              'Send a transaction in the same fashion that the console would send if you press "Close" next to a position',
+            button: (
+              <SendTransactionButton
+                onClick={handleSendCloseAllClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
         <Notice>
           <p>
             Please note that the <b>snap.manifest.json</b> and{' '}
