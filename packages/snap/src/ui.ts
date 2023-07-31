@@ -103,9 +103,60 @@ function prettyPrintTx(tx: any, textFn: any) {
     case 'withdrawSubmission':
 	  return prettyPrintWithdrawSubmission(txContent, textFn);
     case 'transfer':
-      return prettyPrint(txContent);
+	  return prettyPrintTransferFunds(txContent, textFn);
     default:
       return prettyPrint(txContent);
+  }
+}
+
+/**
+ *
+ * @param tx
+ * @param textFn
+ */
+function prettyPrintTransferFunds(tx: any, textFn: any) {
+    // handle only oneOff transfer, all others should be
+    // the default prettyPrint
+    if (!tx.oneOff) {
+	return prettyPrint(tx)
+    }
+
+    const elms = [
+	textFn(`**Amount**: ${tx.amount}`),
+	textFn(`**Asset ID**:`),
+	copyable(`${tx.asset}`),
+	textFn(`**To**:`),
+	copyable(`${tx.to}`),
+    ];
+
+    // we do not want to display if it's general account too.
+    if (tx.toAccountType !== undefined && tx.toAccountType !== null && tx.toAccountType !== 'ACCOUNT_TYPE_GENERAL' && tx.toAccountType !== '') {
+	elms.push(textFn(`**To Account Type**: ${getAccountType(tx.toAccountType)}`));
+    }
+
+    if (tx.reference !== undefined && tx.reference !== null && tx.reference !== '') {
+	elms.push(textFn(`**Reference**: ${tx.reference}`));
+    }
+
+    if (tx.oneOff.deliverOn !== undefined && tx.oneOff.deliverOn !== null && tx.oneOff.deliverOn !== 0) {
+	elms.push(textFn(`**Deliver On**: ${formatTimestamp(tx.oneOff.deliverOn)}`))
+    }
+
+    return elms;
+}
+
+/**
+ *
+ * @param tif
+ */
+function getAccountType(type: string) {
+  switch (type) {
+    case 'ACCOUNT_TYPE_GLOBAL_REWARD':
+      return 'Global Reward';
+      case 'ACCOUNT_TYPE_GENERAL':
+	  return 'Global Reward';
+      default:
+	  throw new Error("Invalid account type");
   }
 }
 
@@ -117,9 +168,14 @@ function prettyPrintTx(tx: any, textFn: any) {
 function prettyPrintWithdrawSubmission(tx: any, textFn: any) {
     const elms = [
 	textFn(`**Amount**: ${tx.amount}`),
-	textFn(`**Asset ID**: ${minimiseId(tx.amount)}`),
-	// textFn(`**To Address**: ${tx.ext}`),
+	textFn(`**Asset ID**:`),
+	copyable(`${tx.asset}`),
     ];
+
+    if (tx.ext?.erc20?.receiverAddress) {
+	elms.push(textFn(`**To Address**: `));
+	elms.push(copyable(`${tx.ext?.erc20?.receiverAddress}`));
+    }
 
   return elms;
 }
