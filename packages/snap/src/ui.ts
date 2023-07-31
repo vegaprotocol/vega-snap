@@ -6,11 +6,12 @@ import { panel, heading, text, divider, copyable } from '@metamask/snaps-ui';
  * @param transaction
  */
 export async function reviewTransaction(origin: string, transaction: any) {
+  const transactionContent = transaction[Object.keys(transaction)[0]]
   const content = panel([
     heading(transactionTitle(transaction)),
     text(`Request from: **${origin}**`),
     divider(),
-    ...prettyPrint(transaction),
+    ...prettyPrint(transactionContent),
     divider(),
     text('Raw transaction:'),
     copyable(JSON.stringify(transaction, null, 2)),
