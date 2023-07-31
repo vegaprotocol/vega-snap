@@ -1,3 +1,6 @@
+/**
+ * Hardcoded list of public Vega networks and their REST endpoints.
+ */
 export const NETWORKS = new Map([
   [
     'Mainnet',
@@ -23,4 +26,7 @@ export const NETWORKS = new Map([
   ],
 ]);
 
+/**
+ * Hardcoded default network
+ */
 export const DEFAULT_NETWORK = 'Fairground';

@@ -1,12 +1,16 @@
 import { panel, heading, text, divider, copyable } from '@metamask/snaps-ui';
 
 /**
+ * Displays a confirmation dialog with the given transaction, pretty printing
+ * the transaction and providing a copyable raw transaction.
  *
- * @param origin
- * @param transaction
+ * @param origin - Origin of the transaction.
+ * @param transaction - Transaction to display.
+ * @returns `true` if the user approves the transaction, `false` otherwise.
  */
 export async function reviewTransaction(origin: string, transaction: any) {
-  const transactionContent = transaction[Object.keys(transaction)[0]]
+  const transactionContent = transaction[Object.keys(transaction)[0]];
+
   const content = panel([
     heading(transactionTitle(transaction)),
     text(`Request from: **${origin}**`),
@@ -27,8 +31,10 @@ export async function reviewTransaction(origin: string, transaction: any) {
 }
 
 /**
+ * Displays a debug dialog with the given object.
  *
- * @param obj
+ * @param obj - Any JSON serializable object to display.
+ * @returns `true` if the user approves the transaction, `false` otherwise.
  */
 export async function debug(obj: any) {
   const content = panel([
@@ -50,8 +56,10 @@ export async function debug(obj: any) {
 }
 
 /**
+ * Recurively pretty prints an object as snap-ui elements.
  *
- * @param obj
+ * @param obj - Object to pretty print. Primitives will be coerced to strings, while objects will be recursed into.
+ * @returns List of snap-ui elements.
  */
 function prettyPrint(obj: any) {
   const elms = [];
@@ -69,8 +77,10 @@ function prettyPrint(obj: any) {
 }
 
 /**
+ * Formats a human readable transaction title based on the transaction command.
  *
- * @param tx
+ * @param tx - Object with a single command property. Uusally the incoming `transaction` property from `client.send_transaction`.
+ * @returns A human readable transaction title.
  */
 function transactionTitle(tx: any): string {
   const keys = Object.keys(tx);

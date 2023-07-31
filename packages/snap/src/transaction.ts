@@ -4,7 +4,16 @@ import { solve } from '@vegaprotocol/crypto/cjs/pow.cjs';
 import { InputData, Transaction } from '@vegaprotocol/protos/vega/commands/v1';
 import { deriveKeyPair } from './keys';
 
-export const send = async (node, transaction, sendingMode, publicKey) => {
+/**
+ * Encode and send a transaction to the Vega network.
+ *
+ * @param node - A `NodeRPC` instance.
+ * @param transaction - The transaction to send.
+ * @param sendingMode - The sending mode to use, must be one of `TYPE_SYNC` or `TYPE_ASYNC`.
+ * @param publicKey - The public key of the key pair to use to sign the transaction.
+ * @returns An object with the transaction hash, the transaction as JSON and the time it was sent.
+ */
+export async function send(node, transaction, sendingMode, publicKey) {
   const latestBlock = await node.blockchainHeight();
   const { chainId } = latestBlock;
 
@@ -29,12 +38,15 @@ export const send = async (node, transaction, sendingMode, publicKey) => {
     transactionHash: res.txHash,
     transaction: tx.json,
   };
-};
+}
 
 /**
+ * Helper to encode input data for a transaction, with a random nonce.
  *
- * @param command
- * @param latestBlock
+ * @param command - The command to encode.
+ * @param latestBlock - The latest block from the Vega network.
+ * @param latestBlock.height - The height of the latest block.
+ * @returns The encoded input data.
  */
 async function encodeInputData(command, latestBlock) {
   const inputData = InputData.encode({
@@ -47,11 +59,13 @@ async function encodeInputData(command, latestBlock) {
 }
 
 /**
+ * Helper to encode and sign a transaction.
  *
- * @param inputData
- * @param keyPair
- * @param pow
- * @param chainId
+ * @param inputData - The encoded input data.
+ * @param keyPair - The key pair to use to sign the transaction.
+ * @param pow - The solved PoW challenge.
+ * @param chainId - The chain ID of the Vega network.
+ * @returns The encoded transaction as raw bytes and as JSON.
  */
 async function encodeTransaction(inputData, keyPair, pow, chainId) {
   const signature = {
@@ -89,8 +103,12 @@ async function encodeTransaction(inputData, keyPair, pow, chainId) {
 }
 
 /**
+ * Helper to solve a PoW challenge. This is wrapped in a function to make it easier to run in parallel.
  *
- * @param latestBlock
+ * @param latestBlock - The latest block from the Vega network.
+ * @param latestBlock.spamPowDifficulty - The difficulty of the PoW challenge.
+ * @param latestBlock.hash - The hash of the latest block.
+ * @returns The solved PoW challenge.
  */
 async function solvePoW(latestBlock: any) {
   const tid = await randomTid();
@@ -99,29 +117,36 @@ async function solvePoW(latestBlock: any) {
   return pow;
 }
 
-/**
- *
- * @param command
- */
-async function sanitizeCommand(command: any) {
-  const inputData = InputData.decode(
-    InputData.encode({
-      command,
-    }),
-  );
+// /**
+//  * Sanitizes a command to be used in a transaction, by encoding and decoding it.
+//  * This effectively removes any unknown fields from the command.
+//  *
+//  * @param command - The command to sanitize.
+//  * @returns The sanitized command.
+//  */
+// async function sanitizeCommand(command: any) {
+//   const inputData = InputData.decode(
+//     InputData.encode({
+//       command,
+//     }),
+//   );
+//
+//   return inputData.command;
+// }
 
-  return inputData.command;
-}
-
 /**
+ * Generates a random transaction ID using a cryptographically secure random number generator.
  *
+ * @returns A random transaction ID as a hex string.
  */
 async function randomTid(): Promise<string> {
   return toHex(await randomFill(new Uint8Array(32)));
 }
 
 /**
+ * Generates a random U64 bit nonce using a cryptographically secure random number generator.
  *
+ * @returns A random nonce as a bigint.
  */
 async function randomNonce(): Promise<bigint> {
   const dv = new DataView(await randomFill(new Uint8Array(8)).buffer);
