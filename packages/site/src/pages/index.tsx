@@ -162,10 +162,7 @@ const Index = () => {
                 'fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55',
               amount: '1',
               to: (await listKeys()).keys[0].publicKey,
-
-              kind: {
-                oneOff: {}
-              }
+              oneOff: {}
             }
           }
         }))),
