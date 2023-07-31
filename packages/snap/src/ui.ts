@@ -80,11 +80,12 @@ function minimiseId(id: string) {
  */
 function prettyPrintTx(tx: any, textFn: any) {
   const keys = Object.keys(tx);
-  const txContent = tx[Object.keys(tx)[0]];
 
   if (keys.length !== 1) {
     throw new Error('Invalid transaction');
   }
+
+  const txContent = tx[keys[0]];
 
   switch (keys[0]) {
     case 'batchMarketInstructions':
@@ -96,7 +97,7 @@ function prettyPrintTx(tx: any, textFn: any) {
     case 'orderAmendment':
       return prettyPrintOrderAmendment(txContent, textFn);
     case 'withdrawSubmission':
-      prettyPrintWithdrawSubmission(txContent, textFn);
+	  return prettyPrintWithdrawSubmission(txContent, textFn);
     case 'transfer':
       return prettyPrint(txContent);
     default:
@@ -110,7 +111,12 @@ function prettyPrintTx(tx: any, textFn: any) {
  * @param textFn
  */
 function prettyPrintWithdrawSubmission(tx: any, textFn: any) {
-  const elms = [];
+    const elms = [
+	textFn(`**Amount**: ${tx.amount}`),
+	textFn(`**Asset ID**: ${minimiseId(tx.amount)}`),
+	// textFn(`**To Address**: ${tx.ext}`),
+    ];
+
   return elms;
 }
 
@@ -121,8 +127,7 @@ function prettyPrintWithdrawSubmission(tx: any, textFn: any) {
  */
 function prettyPrintOrderSubmission(tx: any, textFn: any) {
   const elms = [];
-  const isLimit =
-    tx.price !== undefined && tx.price !== null && tx.price !== '';
+  const isLimit = tx.type === 'TYPE_LIMIT';
   const side = tx.side === 'TYPE_BUY' ? 'buy' : 'sell';
 
   if (tx.peggedOrder) {
@@ -150,25 +155,25 @@ function prettyPrintOrderSubmission(tx: any, textFn: any) {
   }
 
   const marketId = minimiseId(tx.marketId);
-  elms.push(textFn(`**market id**: ${marketId}`));
+  elms.push(textFn(`**Market ID**: ${marketId}`));
 
   if (tx.expiresAt && tx.expiresAt > 0) {
-    elms.push(textFn(`**expires at**: ${marketId}`));
+    elms.push(textFn(`**Expires At**: ${marketId}`));
   }
 
   if (tx.postOnly) {
-    elms.push(textFn(`**post only**: yes`));
+    elms.push(textFn(`**Post Only**: yes`));
   }
 
   if (tx.reduceOnly) {
-    elms.push(textFn(`**reduce only**: yes`));
+    elms.push(textFn(`**Reduce Only**: yes`));
   }
 
   if (tx.icebergOpts) {
-    elms.push(textFn(`**iceberg peak size**: ${tx.icebergOpts.peakSize}`));
+      elms.push(textFn(`**Iceberg Peak Size**: ${tx.icebergOpts.peakSize}`));
     elms.push(
       textFn(
-        `**iceberg minimum visible size**: ${tx.icebergOpts.minimumVisibleSize}`,
+        `**Iceberg Minimum Visible Size**: ${tx.icebergOpts.minimumVisibleSize}`,
       ),
     );
   }
@@ -183,12 +188,12 @@ function prettyPrintOrderSubmission(tx: any, textFn: any) {
  */
 function prettyPrintOrderAmendment(tx: any, textFn: any) {
   const elms = [
-    textFn(`**order id**: ${minimiseId(tx.orderId)}`),
-    textFn(`**market id**: ${minimiseId(tx.marketId)}`),
+    textFn(`**Order ID**: ${minimiseId(tx.orderId)}`),
+    textFn(`**Market ID**: ${minimiseId(tx.marketId)}`),
   ];
 
   if (tx.price !== undefined && tx.price !== null && tx.price !== '') {
-    elms.push(textFn(`**price**: ${tx.price}`));
+    elms.push(textFn(`**Price**: ${tx.price}`));
   }
 
   if (
@@ -197,9 +202,9 @@ function prettyPrintOrderAmendment(tx: any, textFn: any) {
     tx.sizeDelta !== 0
   ) {
     if (tx.sizeDelta > 0) {
-      elms.push(textFn(`**size delta**: +${tx.sizeDelta}`));
+      elms.push(textFn(`**Size Delta**: +${tx.sizeDelta}`));
     } else {
-      elms.push(textFn(`**size delta**: ${tx.sizeDelta}`));
+      elms.push(textFn(`**Size Delta**: ${tx.sizeDelta}`));
     }
   }
 
@@ -208,7 +213,7 @@ function prettyPrintOrderAmendment(tx: any, textFn: any) {
     tx.expiresAt !== null &&
     tx.expiresAt !== 0
   ) {
-    elms.push(textFn(`**expires at**: ${tx.expiresAt}`));
+    elms.push(textFn(`**Expires At**: ${tx.expiresAt}`));
   }
 
   if (
@@ -216,7 +221,7 @@ function prettyPrintOrderAmendment(tx: any, textFn: any) {
     tx.timeInForce !== null &&
     tx.timeInForce !== ''
   ) {
-    elms.push(textFn(`**time in force**: ${getTimeInForce(tx.timeInForce)}`));
+    elms.push(textFn(`**Time In Force**: ${getTimeInForce(tx.timeInForce)}`));
   }
 
   if (
@@ -225,7 +230,7 @@ function prettyPrintOrderAmendment(tx: any, textFn: any) {
     tx.peggededReference !== ''
   ) {
     elms.push(
-      textFn(`**pegged reference**: ${getPeggedReference(tx.peggedReference)}`),
+      textFn(`**Pegged Reference**: ${getPeggedReference(tx.peggedReference)}`),
     );
   }
 
@@ -234,7 +239,7 @@ function prettyPrintOrderAmendment(tx: any, textFn: any) {
     tx.peggedOffset !== null &&
     tx.peggededOffset !== ''
   ) {
-    elms.push(textFn(`**pegged offset**: ${tx.peggedOffset}`));
+    elms.push(textFn(`**Pegged Offset**: ${tx.peggedOffset}`));
   }
 
   return elms;
@@ -252,6 +257,8 @@ function getPeggedReference(ref: string) {
       return 'Bid';
     case 'PEGGED_REFERENCE_BEST_ASK':
       return 'Ask';
+      default:
+	  throw new Error('Unknown Pegged Reference');
   }
 }
 
@@ -273,6 +280,8 @@ function getTimeInForce(tif: string) {
       return 'GFA';
     case 'TIME_IN_FORCE_GFN':
       return 'GFN';
+      default:
+	  throw new Error('Unknown Time in Force');
   }
 }
 
@@ -286,11 +295,9 @@ function prettyPrintBatchMarketInstructions(tx: any) {
 
   if (tx.cancellations && tx.cancellations.length > 0) {
     elms.push(text(`**Order Cancellations:**`));
-    let i = 0;
-    for (const c of tx.cancellations.values()) {
-      elms.push(text(`__${i}:__`));
+      for (const [i, c] of tx.cancellations.entries()) {
+      elms.push(text(`__${i+1}:__`));
       elms.push(...prettyPrintTx({ orderCancellation: c }, indentText));
-      i += 1;
     }
     addDivider = true;
   }
@@ -300,11 +307,9 @@ function prettyPrintBatchMarketInstructions(tx: any) {
       elms.push(divider());
     }
     elms.push(text(`**Order Amendments:**`));
-    let i = 0;
-    for (const c of tx.amendments.values()) {
-      elms.push(text(`__${i}:__`));
+      for (const [i, c] of tx.amendments.entries()) {
+      elms.push(text(`__${i+1}:__`));
       elms.push(...prettyPrintTx({ orderAmendment: c }, indentText));
-      i += 1;
     }
     addDivider = true;
   }
@@ -314,11 +319,9 @@ function prettyPrintBatchMarketInstructions(tx: any) {
       elms.push(divider());
     }
     elms.push(text(`**Order Submissions:**`));
-    let i = 0;
-    for (const c of tx.submissions.values()) {
-      elms.push(text(`__${i}:__`));
+      for (const [i, c] of tx.submissions.entries()) {
+      elms.push(text(`__${i+1}:__`));
       elms.push(...prettyPrintTx({ orderSubmission: c }, indentText));
-      i += 1;
     }
   }
 
@@ -339,15 +342,15 @@ function prettyPrintCancelOrder(tx: any, textFn: any) {
   if (hasOrderId && hasMarketId) {
     return [
       textFn(`Cancel order`),
-      textFn(`**order id**: ${minimiseId(tx.orderId)}`),
-      textFn(`**market id**: ${minimiseId(tx.marketId)}`),
+      textFn(`**Order ID**: ${minimiseId(tx.orderId)}`),
+      textFn(`**Market ID**: ${minimiseId(tx.marketId)}`),
     ];
   } else if (hasOrderId) {
     return [textFn(`Cancel order ${minimiseId(tx.orderId)}`)];
   } else if (hasMarketId) {
     return [
       textFn(`Cancel all orders on market`),
-      textFn(`**market id**: ${minimiseId(tx.marketId)}`),
+      textFn(`**Market ID**: ${minimiseId(tx.marketId)}`),
     ];
   }
   return [textFn(`Cancel all orders from all markets`)];
