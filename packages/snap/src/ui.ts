@@ -73,6 +73,10 @@ function minimiseId(id: string) {
   return id;
 }
 
+function formatTimestamp(t: any) {
+    return new Date(t*1000).toLocaleString();
+}
+
 /**
  *
  * @param tx
@@ -128,7 +132,7 @@ function prettyPrintWithdrawSubmission(tx: any, textFn: any) {
 function prettyPrintOrderSubmission(tx: any, textFn: any) {
   const elms = [];
   const isLimit = tx.type === 'TYPE_LIMIT';
-  const side = tx.side === 'TYPE_BUY' ? 'buy' : 'sell';
+  const side = tx.side === 'TYPE_BUY' ? 'Buy' : 'Sell';
 
   if (tx.peggedOrder) {
     elms.push(
@@ -158,7 +162,7 @@ function prettyPrintOrderSubmission(tx: any, textFn: any) {
   elms.push(textFn(`**Market ID**: ${marketId}`));
 
   if (tx.expiresAt && tx.expiresAt > 0) {
-    elms.push(textFn(`**Expires At**: ${marketId}`));
+      elms.push(textFn(`**Expires At**: ${formatTimestamp(tx.expiresAt)}`));
   }
 
   if (tx.postOnly) {
@@ -213,7 +217,7 @@ function prettyPrintOrderAmendment(tx: any, textFn: any) {
     tx.expiresAt !== null &&
     tx.expiresAt !== 0
   ) {
-    elms.push(textFn(`**Expires At**: ${tx.expiresAt}`));
+      elms.push(textFn(`**Expires At**: ${formatTimestamp(tx.expiresAt)}`));
   }
 
   if (
