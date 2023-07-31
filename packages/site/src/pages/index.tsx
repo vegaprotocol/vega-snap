@@ -152,115 +152,152 @@ const Index = () => {
         payload: 'Transaction sent with hash: ' + JSON.stringify((await sendTransaction({
           sendingMode: 'TYPE_SYNC',
           publicKey: (await listKeys()).keys[0].publicKey,
-          transaction: {
-	      "batchMarketInstructions": {
-              "cancellations": [
-                {
-                  "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
-                  "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55"
-                },
-                {
-                  "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
-                  "orderId": ""
-                },
-                {
-                }
-              ],
-              "amendments": [
-                {
-                  "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
-                  "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55"
-                },
-                {
-                  "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
-                    "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
-		    "price": "1233456"
-                },
-                {
-                  "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
-                    "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
-		    "sizeDelta": 1000
-                },
-                {
-                    "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
-                    "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
-		    "sizeDelta": -1000
-                },
-                {
-                    "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
-                    "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
-		    "expiresAt": 1690813644
-                },
-                {
-                    "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
-                    "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
-		    "timeInForce": "TIME_IN_FORCE_IOC"
-                },
-                {
-                    "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
-                    "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
-		    "peggedOffset": "1000"
-                },
-                {
-                    "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
-                    "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
-		    "peggedReference": "PEGGED_REFERENCE_BEST_BID"
-                },
-                {
-                    "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
-                    "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
-		    "peggedReference": "PEGGED_REFERENCE_BEST_BID",
-		    "sizeDelta": -1000,
-		    "price": "1233456"
-                },
-              ],
-              "submissions": [
-                {
-                  "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
-                  "type": "TYPE_MARKET",
-                  "timeInForce": "TIME_IN_FORCE_IOC",
-                  "side": "SIDE_SELL",
-                  "size": "16000",
-                  "reduceOnly": true
-                },
-                {
-                  "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
-                  "type": "TYPE_LIMIT",
-                  "timeInForce": "TIME_IN_FORCE_GTT",
-                  "side": "SIDE_BUY",
-                  "size": "32000",
-                  "price": "999999",
-                    "postOnly": true,
-		    "expiresAt": 1690813644
-                },
-                {
-                  "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
-                  "type": "TYPE_LIMIT",
-                  "timeInForce": "TIME_IN_FORCE_GTT",
-                  "side": "SIDE_BUY",
-                  "size": "32000",
-                  "price": "999999",
-                    "postOnly": true,
-		    "peggedOrder": {
-			"reference": "PEGGED_REFERENCE_BEST_BID",
-			"offset": "15000"
-		    }
-                },
-                {
-                  "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
-                  "type": "TYPE_LIMIT",
-                  "timeInForce": "TIME_IN_FORCE_GTT",
-                  "side": "SIDE_BUY",
-                  "size": "32000",
-                  "price": "999999",
-                    "postOnly": true,
-		    "icebergOpts": {
-			"peakSize": 1000,
-			"minimumVisibleSize": 4200,
-		    }
-                }
-              ]
-            }
+            transaction: {
+		transfer:  {
+		    fromAccountType: 'ACCOUNT_TYPE_GENERAL',
+		    to: "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+		    toAccountType: 'ACCOUNT_TYPE_GENERAL',
+		    asset: "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
+		    amount: "4242424242",
+		    oneOff: {},
+		}
+		// transfer:  {
+		//     fromAccountType: 'ACCOUNT_TYPE_GENERAL',
+		//     to: "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+		//     toAccountType: 'ACCOUNT_TYPE_GLOBAL_REWARD',
+		//     asset: "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
+		//     amount: "4242424242",
+		//     reference: "OKOKOK",
+		//     oneOff: {},
+		// }
+		// transfer:  {
+		//     fromAccountType: 'ACCOUNT_TYPE_GENERAL',
+		//     to: "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+		//     toAccountType: 'ACCOUNT_TYPE_GENERAL',
+		//     asset: "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
+		//     amount: "4242424242",
+		//     reference: "OKOKOK",
+		//     oneOff: {
+		// 	deliverOn: 1690813644
+		//     },
+		// }
+	      // withdrawSubmission: {
+	      // 	  amount: "424242",
+	      // 	  asset: "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
+	      // 	  ext: {
+	      // 	      erc20: {
+	      // 		  receiverAddress: "0x23872549cE10B40e31D6577e0A920088B0E0666a",
+	      // 	      }
+	      // 	  }
+	      // }
+	      //   "batchMarketInstructions": {
+            //   "cancellations": [
+            //     {
+            //       "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+            //       "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55"
+            //     },
+            //     {
+            //       "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+            //       "orderId": ""
+            //     },
+            //     {
+            //     }
+            //   ],
+            //   "amendments": [
+            //     {
+            //       "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+            //       "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55"
+            //     },
+            //     {
+            //       "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+            //         "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
+	    // 	    "price": "1233456"
+            //     },
+            //     {
+            //       "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+            //         "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
+	    // 	    "sizeDelta": 1000
+            //     },
+            //     {
+            //         "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+            //         "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
+	    // 	    "sizeDelta": -1000
+            //     },
+            //     {
+            //         "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+            //         "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
+	    // 	    "expiresAt": 1690813644
+            //     },
+            //     {
+            //         "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+            //         "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
+	    // 	    "timeInForce": "TIME_IN_FORCE_IOC"
+            //     },
+            //     {
+            //         "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+            //         "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
+	    // 	    "peggedOffset": "1000"
+            //     },
+            //     {
+            //         "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+            //         "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
+	    // 	    "peggedReference": "PEGGED_REFERENCE_BEST_BID"
+            //     },
+            //     {
+            //         "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+            //         "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
+	    // 	    "peggedReference": "PEGGED_REFERENCE_BEST_BID",
+	    // 	    "sizeDelta": -1000,
+	    // 	    "price": "1233456"
+            //     },
+            //   ],
+            //   "submissions": [
+            //     {
+            //       "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+            //       "type": "TYPE_MARKET",
+            //       "timeInForce": "TIME_IN_FORCE_IOC",
+            //       "side": "SIDE_SELL",
+            //       "size": "16000",
+            //       "reduceOnly": true
+            //     },
+            //     {
+            //       "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+            //       "type": "TYPE_LIMIT",
+            //       "timeInForce": "TIME_IN_FORCE_GTT",
+            //       "side": "SIDE_BUY",
+            //       "size": "32000",
+            //       "price": "999999",
+            //         "postOnly": true,
+	    // 	    "expiresAt": 1690813644
+            //     },
+            //     {
+            //       "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+            //       "type": "TYPE_LIMIT",
+            //       "timeInForce": "TIME_IN_FORCE_GTT",
+            //       "side": "SIDE_BUY",
+            //       "size": "32000",
+            //       "price": "999999",
+            //         "postOnly": true,
+	    // 	    "peggedOrder": {
+	    // 		"reference": "PEGGED_REFERENCE_BEST_BID",
+	    // 		"offset": "15000"
+	    // 	    }
+            //     },
+            //     {
+            //       "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+            //       "type": "TYPE_LIMIT",
+            //       "timeInForce": "TIME_IN_FORCE_GTT",
+            //       "side": "SIDE_BUY",
+            //       "size": "32000",
+            //       "price": "999999",
+            //         "postOnly": true,
+	    // 	    "icebergOpts": {
+	    // 		"peakSize": 1000,
+	    // 		"minimumVisibleSize": 4200,
+	    // 	    }
+            //     }
+            //   ]
+            // }
 	      // orderCancellation: {
 		//  orderId: "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
 		//  marketId: "4cb06ca74c44c2c4aea5018ca9106bd771ee0f8904fa4127bcab637bd17801a1"},
