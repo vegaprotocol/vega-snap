@@ -75,7 +75,6 @@ export const sendTransaction = async ({
   transaction,
   publicKey,
 }) => {
-  console.log('sommething');
   return (await window.ethereum.request({
     method: 'wallet_invokeSnap',
     params: {

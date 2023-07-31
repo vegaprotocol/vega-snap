@@ -1,4 +1,7 @@
-export const networks = new Map([
+/**
+ * Hardcoded list of public Vega networks and their REST endpoints.
+ */
+export const NETWORKS = new Map([
   [
     'Mainnet',
     {
@@ -23,12 +26,7 @@ export const networks = new Map([
   ],
 ]);
 
+/**
+ * Hardcoded default network
+ */
 export const DEFAULT_NETWORK = 'Fairground';
-
-export const serializeError = (msg) => {
-  return {
-    error: {
-      message: msg,
-    },
-  };
-};

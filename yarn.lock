@@ -4671,32 +4671,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/template-snap-monorepo@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "@metamask/template-snap-monorepo@workspace:."
-  dependencies:
-    "@metamask/eslint-config": ^10.0.0
-    "@metamask/eslint-config-jest": ^10.0.0
-    "@metamask/eslint-config-nodejs": ^10.0.0
-    "@metamask/eslint-config-typescript": ^10.0.0
-    "@typescript-eslint/eslint-plugin": ^5.33.0
-    "@typescript-eslint/parser": ^5.33.0
-    "@vegaprotocol/crypto": ^0.11.0
-    "@vegaprotocol/protos": ^0.7.1
-    eslint: ^8.21.0
-    eslint-config-prettier: ^8.1.0
-    eslint-plugin-import: ^2.26.0
-    eslint-plugin-jest: ^26.8.2
-    eslint-plugin-jsdoc: ^39.2.9
-    eslint-plugin-node: ^11.1.0
-    eslint-plugin-prettier: ^4.2.1
-    nanoassert: ^2.0.0
-    prettier: ^2.2.1
-    prettier-plugin-packagejson: ^2.2.18
-    typescript: ^4.7.4
-  languageName: unknown
-  linkType: soft
-
 "@metamask/types@npm:^1.1.0":
   version: 1.1.0
   resolution: "@metamask/types@npm:1.1.0"
@@ -6951,6 +6925,67 @@ __metadata:
   checksum: 5b7c85fb0829db579bec68f5c188893a1bbaf93b2d6cc1fb8de735ef085cdd27f8e2dae6ad76b0a9fd3ceac197e8c71086dbcad4223634ef4e6e988ff35e77b4
   languageName: node
   linkType: hard
+
+"@vegaprotocol/snap-monorepo@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@vegaprotocol/snap-monorepo@workspace:."
+  dependencies:
+    "@metamask/eslint-config": ^10.0.0
+    "@metamask/eslint-config-jest": ^10.0.0
+    "@metamask/eslint-config-nodejs": ^10.0.0
+    "@metamask/eslint-config-typescript": ^10.0.0
+    "@typescript-eslint/eslint-plugin": ^5.33.0
+    "@typescript-eslint/parser": ^5.33.0
+    eslint: ^8.21.0
+    eslint-config-prettier: ^8.1.0
+    eslint-plugin-import: ^2.26.0
+    eslint-plugin-jest: ^26.8.2
+    eslint-plugin-jsdoc: ^39.2.9
+    eslint-plugin-node: ^11.1.0
+    eslint-plugin-prettier: ^4.2.1
+    prettier: ^2.2.1
+    prettier-plugin-packagejson: ^2.2.18
+    typescript: ^4.7.4
+  languageName: unknown
+  linkType: soft
+
+"@vegaprotocol/snap@workspace:packages/snap":
+  version: 0.0.0-use.local
+  resolution: "@vegaprotocol/snap@workspace:packages/snap"
+  dependencies:
+    "@jest/globals": ^29.5.0
+    "@lavamoat/allow-scripts": ^2.0.3
+    "@metamask/auto-changelog": ^2.6.0
+    "@metamask/eslint-config": ^10.0.0
+    "@metamask/eslint-config-jest": ^10.0.0
+    "@metamask/eslint-config-nodejs": ^10.0.0
+    "@metamask/eslint-config-typescript": ^10.0.0
+    "@metamask/snaps-cli": ^0.32.2
+    "@metamask/snaps-jest": ^0.35.2-flask.1
+    "@metamask/snaps-types": ^0.32.2
+    "@metamask/snaps-ui": ^0.32.2
+    "@typescript-eslint/eslint-plugin": ^5.33.0
+    "@typescript-eslint/parser": ^5.33.0
+    "@vegaprotocol/crypto": ^0.11.0
+    "@vegaprotocol/protos": ^0.7.1
+    buffer: ^6.0.3
+    eslint: ^8.21.0
+    eslint-config-prettier: ^8.1.0
+    eslint-plugin-import: ^2.26.0
+    eslint-plugin-jest: ^26.8.2
+    eslint-plugin-jsdoc: ^39.2.9
+    eslint-plugin-node: ^11.1.0
+    eslint-plugin-prettier: ^4.2.1
+    jest: ^29.5.0
+    nanoassert: ^2.0.0
+    prettier: ^2.2.1
+    prettier-plugin-packagejson: ^2.2.11
+    rimraf: ^3.0.2
+    through2: ^4.0.2
+    ts-jest: ^29.1.0
+    typescript: ^4.7.4
+  languageName: unknown
+  linkType: soft
 
 "@vercel/webpack-asset-relocator-loader@npm:^1.7.0":
   version: 1.7.3
@@ -20270,43 +20305,6 @@ __metadata:
   checksum: 0a7a79900bbb36f8aaa922cf111702a3647ac6165736d5dc96d3ef367efc50465cac70c53cd172c382b022dac72ec91710608e5393de71f76d7142e6fd80e8a3
   languageName: node
   linkType: hard
-
-"snap@workspace:packages/snap":
-  version: 0.0.0-use.local
-  resolution: "snap@workspace:packages/snap"
-  dependencies:
-    "@jest/globals": ^29.5.0
-    "@lavamoat/allow-scripts": ^2.0.3
-    "@metamask/auto-changelog": ^2.6.0
-    "@metamask/eslint-config": ^10.0.0
-    "@metamask/eslint-config-jest": ^10.0.0
-    "@metamask/eslint-config-nodejs": ^10.0.0
-    "@metamask/eslint-config-typescript": ^10.0.0
-    "@metamask/snaps-cli": ^0.32.2
-    "@metamask/snaps-jest": ^0.35.2-flask.1
-    "@metamask/snaps-types": ^0.32.2
-    "@metamask/snaps-ui": ^0.32.2
-    "@typescript-eslint/eslint-plugin": ^5.33.0
-    "@typescript-eslint/parser": ^5.33.0
-    "@vegaprotocol/crypto": ^0.11.0
-    "@vegaprotocol/protos": ^0.7.1
-    buffer: ^6.0.3
-    eslint: ^8.21.0
-    eslint-config-prettier: ^8.1.0
-    eslint-plugin-import: ^2.26.0
-    eslint-plugin-jest: ^26.8.2
-    eslint-plugin-jsdoc: ^39.2.9
-    eslint-plugin-node: ^11.1.0
-    eslint-plugin-prettier: ^4.2.1
-    jest: ^29.5.0
-    prettier: ^2.2.1
-    prettier-plugin-packagejson: ^2.2.11
-    rimraf: ^3.0.2
-    through2: ^4.0.2
-    ts-jest: ^29.1.0
-    typescript: ^4.7.4
-  languageName: unknown
-  linkType: soft
 
 "socket.io-adapter@npm:~2.4.0":
   version: 2.4.0

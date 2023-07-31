@@ -1,13 +1,13 @@
 {
-  "name": "snap",
-  "version": "0.1.0",
+  "name": "@vegaprotocol/snap",
+  "version": "0.0.0",
   "private": true,
-  "description": "The 'Hello, world!' of MetaMask Snaps, now written in TypeScript.",
+  "description": "Vega Metamask Snap that adds Vega support for Metamask",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MetaMask/template-snap-monorepo.git"
+    "url": "https://github.com/vegaprotocol/vega-snap.git"
   },
-  "license": "(MIT-0 OR Apache-2.0)",
+  "license": "MIT",
   "main": "src/index.ts",
   "files": [
     "dist/",
@@ -31,7 +31,8 @@
     "@metamask/snaps-ui": "^0.32.2",
     "@vegaprotocol/crypto": "^0.11.0",
     "@vegaprotocol/protos": "^0.7.1",
-    "buffer": "^6.0.3"
+    "buffer": "^6.0.3",
+    "nanoassert": "^2.0.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.5.0",

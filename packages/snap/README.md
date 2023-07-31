@@ -1,8 +1,9 @@
-# TypeScript Example Snap
+# Vega Snap
 
-This snap demonstrates how to develop a snap with TypeScript. It is a simple
-snap that displays a confirmation dialog when the `hello` JSON-RPC method is
-called.
+This snap adds support for the Vega Protocol network to MetaMask.
+It supports `client.list_keys`, `client.get_chain_id` and `client.send_transaction`
+from the Vega Wallet API. `client.connect_wallet` and `client.disconnect_wallet`
+are no-op's, but kept to provide compatibility with the Vega Wallet API.
 
 ## Testing
 
