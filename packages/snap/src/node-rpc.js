@@ -12,6 +12,10 @@ export default class NodeRPC {
     this._url = nodeUrl
   }
 
+    getURL() {
+	return this._url;
+    }
+
   /**
    * Make direct GET request to data node
    *
