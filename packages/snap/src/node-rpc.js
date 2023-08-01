@@ -12,10 +12,6 @@ export default class NodeRPC {
     this._url = nodeUrl
   }
 
-    getURL() {
-	return this._url;
-    }
-
   /**
    * @returns {URL}
    */
