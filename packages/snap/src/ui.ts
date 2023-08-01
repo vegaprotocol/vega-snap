@@ -1,4 +1,5 @@
 import { panel, heading, text, divider, copyable } from '@metamask/snaps-ui';
+import { invalidParameters } from './errors';
 
 /**
  * Displays a confirmation dialog with the given transaction, pretty printing
@@ -6,13 +7,13 @@ import { panel, heading, text, divider, copyable } from '@metamask/snaps-ui';
  *
  * @param origin - Origin of the transaction.
  * @param transaction - Transaction to display.
- * @param selectedNetworkEntrypoint - The selected entrypoint out of the user inputs.
+ * @param selectedNetworkEntrypoint - The selected network entrypoint as a URL. The origin is displayed to the user.
  * @returns `true` if the user approves the transaction, `false` otherwise.
  */
 export async function reviewTransaction(
   origin: string,
   transaction: any,
-  selectedNetworkEntrypoint: string,
+  selectedNetworkEntrypoint: URL,
 ) {
   const content = panel([
     heading(transactionTitle(transaction)),
@@ -20,7 +21,7 @@ export async function reviewTransaction(
     divider(),
     ...prettyPrintTx(transaction, text),
     divider(),
-    text(`Selected network entrypoint: ${selectedNetworkEntrypoint}`),
+    text(`Selected network entrypoint: ${selectedNetworkEntrypoint.origin}`),
     divider(),
     text('Raw transaction:'),
     copyable(JSON.stringify(transaction, null, 2)),
@@ -78,8 +79,8 @@ function indentText(t: string) {
  * @returns A minimised Vega ID.
  */
 function minimiseId(id: string) {
-  if (id.length >= 12) {
-    return `${id.slice(0, 6)}…${id.slice(id.length - 6, id.length)}`;
+  if (id.length > 12) {
+    return `${id.slice(0, 6)}…${id.slice(-6)}`;
   }
   return id;
 }
@@ -90,7 +91,7 @@ function minimiseId(id: string) {
  * @param t - A unix timestamps as an integer.
  * @returns A unix timestamps formatted into a human readable date.
  */
-function formatTimestamp(t: any) {
+function formatTimestamp(t: number) {
   return new Date(t * 1000).toLocaleString();
 }
 
@@ -105,9 +106,9 @@ function getAccountType(type: string) {
     case 'ACCOUNT_TYPE_GLOBAL_REWARD':
       return 'Global Reward';
     case 'ACCOUNT_TYPE_GENERAL':
-      return 'Global Reward';
+      return 'General';
     default:
-      throw new Error('Invalid account type');
+      throw invalidParameters('Invalid account type');
   }
 }
 
@@ -122,7 +123,7 @@ function prettyPrintTx(tx: any, textFn: any) {
   const keys = Object.keys(tx);
 
   if (keys.length !== 1) {
-    throw new Error('Invalid transaction');
+    throw invalidParameters('Invalid transaction');
   }
 
   const txContent = tx[keys[0]];
@@ -155,7 +156,7 @@ function prettyPrintTx(tx: any, textFn: any) {
 function prettyPrintTransferFunds(tx: any, textFn: any) {
   // handle only oneOff transfer, all others should be
   // the default prettyPrint
-  if (!tx.oneOff) {
+  if (!tx.oneOff || !tx.kind.oneOff) {
     return prettyPrint(tx);
   }
 
@@ -193,7 +194,11 @@ function prettyPrintTransferFunds(tx: any, textFn: any) {
     tx.oneOff.deliverOn !== 0
   ) {
     elms.push(
-      textFn(`**Deliver On**: ${formatTimestamp(tx.oneOff.deliverOn)}`),
+      textFn(
+        `**Deliver On**: ${formatTimestamp(
+          tx.oneOff?.deliverOn ?? tx.kind.oneOff.deliverOn,
+        )}`,
+      ),
     );
   }
 
@@ -232,7 +237,7 @@ function prettyPrintWithdrawSubmission(tx: any, textFn: any) {
 function prettyPrintOrderSubmission(tx: any, textFn: any) {
   const elms = [];
   const isLimit = tx.type === 'TYPE_LIMIT';
-  const side = tx.side === 'TYPE_BUY' ? 'Buy' : 'Sell';
+  const side = getSide(tx.side);
 
   if (tx.peggedOrder) {
     elms.push(
@@ -366,7 +371,7 @@ function getPeggedReference(ref: string) {
     case 'PEGGED_REFERENCE_BEST_ASK':
       return 'Ask';
     default:
-      throw new Error('Unknown Pegged Reference');
+      throw invalidParameters('Unknown Pegged Reference');
   }
 }
 
@@ -391,7 +396,24 @@ function getTimeInForce(tif: string) {
     case 'TIME_IN_FORCE_GFN':
       return 'GFN';
     default:
-      throw new Error('Unknown Time in Force');
+      throw invalidParameters('Unknown Time in Force');
+  }
+}
+
+/**
+ * Gets a human readable string representing a side.
+ *
+ * @param side - The side.
+ * @returns The human readable string.
+ */
+function getSide(side: string) {
+  switch (side) {
+    case 'SIDE_BUY':
+      return 'Buy';
+    case 'SIDE_SELL':
+      return 'Sell';
+    default:
+      throw invalidParameters('Unknown Side');
   }
 }
 
@@ -501,7 +523,7 @@ function transactionTitle(tx: any): string {
   const keys = Object.keys(tx);
 
   if (keys.length !== 1) {
-    throw new Error('Invalid transaction');
+    throw invalidParameters('Invalid transaction');
   }
 
   switch (keys[0]) {
@@ -560,6 +582,6 @@ function transactionTitle(tx: any): string {
     case 'oracleDataSubmission':
       return 'Oracle data submission';
     default:
-      throw new Error('Unknown transaction type');
+      throw invalidParameters('Unknown transaction type');
   }
 }
