@@ -156,7 +156,7 @@ function prettyPrintTx(tx: any, textFn: any) {
 function prettyPrintTransferFunds(tx: any, textFn: any) {
   // handle only oneOff transfer, all others should be
   // the default prettyPrint
-  if (!tx.oneOff || !tx.kind?.oneOff) {
+  if (!tx.oneOff && !tx.kind?.oneOff) {
     return prettyPrint(tx);
   }
 
@@ -188,13 +188,20 @@ function prettyPrintTransferFunds(tx: any, textFn: any) {
     elms.push(textFn(`**Reference**: ${tx.reference}`));
   }
 
-  if (tx.kind?.oneOff?.deliverOn !== 0) {
+  if (tx.kind?.oneOff?.deliverOn != null && tx.kind?.oneOff?.deliverOn !== 0) {
     elms.push(
       textFn(`**Deliver On**: ${formatTimestamp(tx.kind.oneOff.deliverOn)}`),
     );
-  } else if (tx.oneOff?.deliverOn !== 0) {
+  } else if (
+    tx.oneOff?.deliverOn != null &&
+    tx.oneOff?.deliverOn !== 0
+  ) {
     elms.push(
-      textFn(`**Deliver On**: ${formatTimestamp(tx.oneOff.deliverOn)}`),
+      textFn(
+        `**Deliver On**: ${formatTimestamp(
+          tx.oneOff.deliverOn
+        )}`,
+      ),
     );
   }
 
@@ -238,18 +245,15 @@ function prettyPrintOrderSubmission(tx: any, textFn: any) {
   if (tx.peggedOrder) {
     elms.push(
       textFn(
-        `Pegged Limit ${side} - ${getTimeInForce(tx.timeInForce)} ${
-          tx.size
-        } @ ${getPeggedReference(tx.peggedOrder.reference)}+${
-          tx.peggedOrder.offset
+        `Pegged Limit ${side} - ${getTimeInForce(tx.timeInForce)} ${tx.size
+        } @ ${getPeggedReference(tx.peggedOrder.reference)}+${tx.peggedOrder.offset
         }`,
       ),
     );
   } else if (isLimit) {
     elms.push(
       textFn(
-        `Limit ${side} - ${getTimeInForce(tx.timeInForce)} ${tx.size} @ ${
-          tx.price
+        `Limit ${side} - ${getTimeInForce(tx.timeInForce)} ${tx.size} @ ${tx.price
         }`,
       ),
     );
