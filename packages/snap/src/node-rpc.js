@@ -17,6 +17,13 @@ export default class NodeRPC {
     }
 
   /**
+   * @returns {URL}
+   */
+  getURL() {
+    return this._url
+  }
+
+  /**
    * Make direct GET request to data node
    *
    * @param {string} url - href part of the URL

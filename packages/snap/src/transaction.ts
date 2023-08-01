@@ -2,6 +2,7 @@ import { toBase64, toHex } from '@vegaprotocol/crypto/cjs/buf.cjs';
 import { randomFill } from '@vegaprotocol/crypto/cjs/crypto.cjs';
 import { solve } from '@vegaprotocol/crypto/cjs/pow.cjs';
 import { InputData, Transaction } from '@vegaprotocol/protos/vega/commands/v1';
+import { invalidParameters } from './errors';
 import { deriveKeyPair } from './keys';
 
 /**
@@ -25,7 +26,7 @@ export async function send(node, transaction, sendingMode, publicKey) {
   const keyPair = await deriveKeyPair(0);
 
   if (keyPair.publicKey.toString() !== publicKey) {
-    throw new Error('Uknown public key');
+    throw invalidParameters('Uknown public key');
   }
 
   const tx = await encodeTransaction(inputData, keyPair, pow, chainId);
