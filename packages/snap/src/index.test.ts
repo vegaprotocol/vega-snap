@@ -31,17 +31,23 @@ async function createHTTPServer(
     server.listen(() => {
       const { port } = server.address() as { port: number };
       const url = `http://localhost:${port}`;
-      resolveServer({
-        close: () => {
-          return new Promise((resolveClose, rejectClose) => {
-            server.close((err) => {
-              if (err) {
-                return rejectClose(err);
-              }
-              return resolveClose();
-            });
+
+      /**
+       * Close the HTTP server, resolving when the fully closed.
+       */
+      function close(): Promise<void> {
+        return new Promise((resolveClose, rejectClose) => {
+          server.close((err) => {
+            if (err) {
+              return rejectClose(err);
+            }
+            return resolveClose();
           });
-        },
+        });
+      }
+
+      resolveServer({
+        close,
         url,
       });
     });
@@ -407,7 +413,7 @@ describe('onRpcRequest', () => {
     const txHash =
       '542db2288551c24359eb933cba5c43dd0cfd20a87a76756af97c93a1ec4d0577';
 
-    const { close: closeServer, url } = await createHTTPServer((pathname) => {
+    const { url } = await createHTTPServer((pathname) => {
       if (pathname === '/blockchain/height') {
         return {
           status: 200,
@@ -476,6 +482,5 @@ describe('onRpcRequest', () => {
     });
 
     await close();
-    await closeServer();
   });
 });
