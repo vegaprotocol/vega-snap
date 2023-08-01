@@ -56,14 +56,11 @@ describe('onRpcRequest', () => {
       method: 'foo',
     });
 
-    expect(response).toRespondWithError({
-      code: -32603,
-      message: 'Internal JSON-RPC error.',
-      data: {
-        cause: {
-          message: 'Method not found.',
-          stack: expect.any(String),
-        },
+    expect(response).toRespondWith({
+      error: {
+        code: -32601,
+        message: 'Method not found',
+        data: expect.anything(),
       },
     });
 
