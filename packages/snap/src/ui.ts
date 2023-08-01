@@ -188,12 +188,16 @@ function prettyPrintTransferFunds(tx: any, textFn: any) {
     elms.push(textFn(`**Reference**: ${tx.reference}`));
   }
 
-  if (tx.kind?.oneOff?.deliverOn != null && tx.kind?.oneOff?.deliverOn !== 0) {
+  if (tx.kind?.oneOff?.deliverOn !== null &&
+    tx.kind?.oneOff?.deliverOn !== undefined &&
+    tx.kind?.oneOff?.deliverOn !== 0
+  ) {
     elms.push(
       textFn(`**Deliver On**: ${formatTimestamp(tx.kind.oneOff.deliverOn)}`),
     );
   } else if (
-    tx.oneOff?.deliverOn != null &&
+    tx.oneOff?.deliverOn !== null &&
+    tx.oneOff?.deliverOn !== undefined &&
     tx.oneOff?.deliverOn !== 0
   ) {
     elms.push(
