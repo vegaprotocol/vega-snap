@@ -55,7 +55,12 @@ export const getChainId = async () => {
     method: 'wallet_invokeSnap',
     params: {
       snapId: defaultSnapOrigin,
-      request: { method: 'client.get_chain_id' },
+      request: {
+        method: 'client.get_chain_id',
+        params: {
+          networkEndpoints: ['https://api.n06.testnet.vega.xyz'],
+        },
+      },
     },
   })) as Promise<{ chainID: string }>;
 };
@@ -85,6 +90,7 @@ export const sendTransaction = async ({
           sendingMode,
           transaction,
           publicKey,
+          networkEndpoints: ['https://api.n06.testnet.vega.xyz'],
         },
       },
     },

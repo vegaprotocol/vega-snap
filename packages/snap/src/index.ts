@@ -1,7 +1,6 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import rpc from './node-rpc';
 import * as txs from './transaction';
-import * as config from './config';
 import { deriveKeyPair } from './keys';
 import { reviewTransaction } from './ui';
 
@@ -19,39 +18,44 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     }
 
     case 'client.get_chain_id': {
+      const { networkEndpoints } = request.params;
+      if (!networkEndpoints || networkEndpoints.length === 0) {
+        throw new Error('No network endpoints provided');
+      }
+
       const res = await (
-        await rpc.findHealthyNode(
-          config.NETWORKS.get(config.DEFAULT_NETWORK).rest.map(
-            (u) => new URL(u),
-          ),
-        )
+        await rpc.findHealthyNode(networkEndpoints.map((u) => new URL(u)))
       ).blockchainHeight();
 
       return { chainID: res.chainId };
     }
 
     case 'client.send_transaction': {
-      const { sendingMode, transaction, publicKey } = request.params;
+      const { sendingMode, transaction, publicKey, networkEndpoints } =
+        request.params;
       if (sendingMode !== 'TYPE_SYNC' && sendingMode !== 'TYPE_ASYNC') {
         throw new Error('Not a valid sending mode.');
       }
 
-      const approved = await reviewTransaction(origin, transaction);
+      if (!networkEndpoints || networkEndpoints.length === 0) {
+        throw new Error('No network endpoints provided');
+      }
+
+      const node = await rpc.findHealthyNode(
+        networkEndpoints.map((u) => new URL(u)),
+      );
+
+      const approved = await reviewTransaction(
+        origin,
+        transaction,
+        node.getURL(),
+      );
 
       if (approved !== true) {
         throw new Error('User rejected the transaction');
       }
 
-      return txs.send(
-        await rpc.findHealthyNode(
-          config.NETWORKS.get(config.DEFAULT_NETWORK).rest.map(
-            (u) => new URL(u),
-          ),
-        ),
-        transaction,
-        sendingMode,
-        publicKey,
-      );
+      return txs.send(node, transaction, sendingMode, publicKey);
     }
 
     // No-op's to be compatible with Vega client API

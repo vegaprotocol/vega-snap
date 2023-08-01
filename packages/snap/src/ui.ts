@@ -6,14 +6,21 @@ import { panel, heading, text, divider, copyable } from '@metamask/snaps-ui';
  *
  * @param origin - Origin of the transaction.
  * @param transaction - Transaction to display.
+ * @param selectedNetworkEntrypoint - The selected entrypoint out of the user inputs.
  * @returns `true` if the user approves the transaction, `false` otherwise.
  */
-export async function reviewTransaction(origin: string, transaction: any) {
+export async function reviewTransaction(
+  origin: string,
+  transaction: any,
+  selectedNetworkEntrypoint: string,
+) {
   const content = panel([
     heading(transactionTitle(transaction)),
     text(`Request from: **${origin}**`),
     divider(),
     ...prettyPrintTx(transaction, text),
+    divider(),
+    text(`Selected network entrypoint: ${selectedNetworkEntrypoint}`),
     divider(),
     text('Raw transaction:'),
     copyable(JSON.stringify(transaction, null, 2)),
