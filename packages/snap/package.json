@@ -27,7 +27,9 @@
     "lint:misc": "prettier '**/*.json' '**/*.md' '!CHANGELOG.md' --ignore-path .gitignore",
     "serve": "mm-snap serve",
     "start": "mm-snap watch",
-    "test": "jest"
+    "test": "jest",
+    "version": "yarn build && git add snap.manifest.json",
+    "prepublishOnly": "yarn build"
   },
   "dependencies": {
     "@metamask/snaps-types": "^0.32.2",
