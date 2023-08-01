@@ -60,7 +60,7 @@ describe('onRpcRequest', () => {
       error: {
         code: -32601,
         message: 'Method not found',
-        data: expect.anything(),
+        data: null,
       },
     });
 
