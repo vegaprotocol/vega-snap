@@ -6,6 +6,7 @@ import { reviewTransaction } from './ui';
 import {
   invalidParameters,
   JSONRPCError,
+  methodNotFound,
   noHealthyNode,
   transactionDenied,
   transactionFailed,
@@ -114,7 +115,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         return null;
 
       default:
-        throw new Error('Method not found.');
+        throw methodNotFound();
     }
   } catch (ex) {
     if (ex instanceof JSONRPCError) {

@@ -19,6 +19,8 @@ export class JSONRPCError extends Error {
 }
 
 // These are the same as Web Wallet
+export const methodNotFound = () =>
+  new JSONRPCError('Method not found', -32601, null);
 export const invalidParameters = (message: string) =>
   new JSONRPCError('Invalid parameters', -1, message);
 export const unknownPublicKey = () =>
