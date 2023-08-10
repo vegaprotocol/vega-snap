@@ -25,17 +25,17 @@
     "lint:eslint": "eslint . --cache --ext js,ts",
     "lint:fix": "yarn lint:eslint --fix && yarn lint:misc --write",
     "lint:misc": "prettier '**/*.json' '**/*.md' '!CHANGELOG.md' --ignore-path .gitignore",
+    "prepublishOnly": "yarn build",
     "serve": "mm-snap serve",
     "start": "mm-snap watch",
     "test": "jest",
-    "version": "yarn build && git add snap.manifest.json",
-    "prepublishOnly": "yarn build"
+    "version": "yarn build && git add snap.manifest.json"
   },
   "dependencies": {
     "@metamask/snaps-types": "^0.32.2",
     "@metamask/snaps-ui": "^0.32.2",
     "@vegaprotocol/crypto": "^0.11.0",
-    "@vegaprotocol/protos": "^0.7.1",
+    "@vegaprotocol/protos": "^0.7.2",
     "buffer": "^6.0.3",
     "nanoassert": "^2.0.0"
   },
