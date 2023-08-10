@@ -153,17 +153,127 @@ const Index = () => {
           sendingMode: 'TYPE_SYNC',
           publicKey: (await listKeys()).keys[0].publicKey,
           transaction: {
-            transfer: {
-              fromAccountType: 'ACCOUNT_TYPE_GENERAL',
-              toAccountType: 'ACCOUNT_TYPE_GENERAL',
-
-              // Vega
-              asset:
-                'fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55',
-              amount: '1',
-              to: (await listKeys()).keys[0].publicKey,
-              oneOff: {}
+	      "batchMarketInstructions": {
+		  "cancellations": [
+                      {
+			  "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+			  "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55"
+                      },
+                      {
+			  "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+			  "orderId": ""
+                      },
+                      {
+                      }
+		  ],
+		  "amendments": [
+                {
+                    "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+                    "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
+		    "sizeDelta": -1000
+                },
+                //       {
+                //   "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+		// 	  "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
+ 		//     "timeInForce": "TIME_IN_FORCE_IOC"
+                // },
+                // {
+                //   "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+                //     "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
+		//     "price": "1233456"
+                // },
+                // {
+                //   "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+                //     "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
+		//     "sizeDelta": 1000,
+ 		//     "timeInForce": "TIME_IN_FORCE_IOC"
+                // },
+                // {
+                //     "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+                //     "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
+		//     "expiresAt": 1690813644
+                // },
+                // {
+                //     "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+                //     "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
+		//     "timeInForce": "TIME_IN_FORCE_IOC"
+                // },
+                // {
+                //     "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+                //     "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
+		//     "peggedOffset": "1000"
+                // },
+                // {
+                //     "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+                //     "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
+		//     "peggedReference": "PEGGED_REFERENCE_BEST_BID"
+                // },
+                // {
+                //     "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+                //     "orderId": "fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55",
+		//     "peggedReference": "PEGGED_REFERENCE_BEST_BID",
+		//     "sizeDelta": -1000,
+		//     "price": "1233456"
+                // },
+              ],
+		  "submissions": [
+                {
+                  "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+                  "type": "TYPE_MARKET",
+                  "timeInForce": "TIME_IN_FORCE_IOC",
+                  "side": "SIDE_SELL",
+                  "size": "16000",
+                  "reduceOnly": true
+                },
+                {
+                  "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+                  "type": "TYPE_LIMIT",
+                  "timeInForce": "TIME_IN_FORCE_GTT",
+                  "side": "SIDE_BUY",
+                  "size": "32000",
+                  "price": "999999",
+                    "postOnly": true,
+		    "expiresAt": 1690813644
+                },
+                {
+                  "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+                  "type": "TYPE_LIMIT",
+                  "timeInForce": "TIME_IN_FORCE_GTT",
+                  "side": "SIDE_BUY",
+                  "size": "32000",
+                  "price": "999999",
+                    "postOnly": true,
+		    "peggedOrder": {
+			"reference": "PEGGED_REFERENCE_BEST_BID",
+			"offset": "15000"
+		    }
+                },
+                {
+                  "marketId": "e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f",
+                  "type": "TYPE_LIMIT",
+                  "timeInForce": "TIME_IN_FORCE_GTT",
+                  "side": "SIDE_BUY",
+                  "size": "32000",
+                  "price": "999999",
+                    "postOnly": true,
+		    "icebergOpts": {
+			"peakSize": 1000,
+			"minimumVisibleSize": 4200,
+		    }
+                }
+              ]
             }
+              // transfer: {
+            //   fromAccountType: 'ACCOUNT_TYPE_GENERAL',
+            //   toAccountType: 'ACCOUNT_TYPE_GENERAL',
+
+            //   // Vega
+            //   asset:
+            //     'fc7fd956078fb1fc9db5c19b88f0874c4299b2a7639ad05a47a28c0aef291b55',
+            //   amount: '1',
+            //   to: (await listKeys()).keys[0].publicKey,
+            //   oneOff: {}
+            // }
           }
         }))),
       })

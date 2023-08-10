@@ -42,6 +42,18 @@ export async function send(node, transaction, sendingMode, publicKey) {
 }
 
 /**
+ *
+ * @param command
+ */
+export async function sanitizeCommand(command) {
+  const inputData = InputData.encode({
+    command,
+  });
+
+  return InputData.decode(inputData).command;
+}
+
+/**
  * Helper to encode input data for a transaction, with a random nonce.
  *
  * @param command - The command to encode.

@@ -19,12 +19,16 @@ export async function reviewTransaction(
     heading(transactionTitle(transaction)),
     text(`Request from: **${origin}**`),
     divider(),
-    ...prettyPrintTx(transaction, text),
+    ...(await prettyPrintTx(transaction, text)),
     divider(),
     text(`Selected network entrypoint: ${selectedNetworkEntrypoint.origin}`),
     divider(),
     text('Raw transaction:'),
-    copyable(JSON.stringify(transaction, null, 2)),
+    copyable(
+      JSON.stringify(transaction, (_, v) =>
+        typeof v === 'bigint' ? v.toString() : v,
+      ),
+    ),
   ]);
 
   return snap.request({
@@ -49,7 +53,9 @@ export async function debug(obj: any) {
     ...prettyPrint(obj),
     divider(),
     text('Raw data:'),
-    copyable(JSON.stringify(obj, null, 2)),
+    copyable(
+      JSON.stringify(obj, (_, v) => (typeof v === 'bigint' ? v.toString() : v)),
+    ),
   ]);
 
   return snap.request({
@@ -119,7 +125,7 @@ function getAccountType(type: string) {
  * @param textFn - The text function to be use for rendering.
  * @returns List of snap-ui elements.
  */
-function prettyPrintTx(tx: any, textFn: any) {
+async function prettyPrintTx(tx: any, textFn: any) {
   const keys = Object.keys(tx);
 
   if (keys.length !== 1) {
@@ -153,7 +159,7 @@ function prettyPrintTx(tx: any, textFn: any) {
  * @param textFn - The text function to be used for rendering.
  * @returns List of snap-ui elements.
  */
-function prettyPrintTransferFunds(tx: any, textFn: any) {
+async function prettyPrintTransferFunds(tx: any, textFn: any) {
   // handle only oneOff transfer, all others should be
   // the default prettyPrint
   if (!tx.oneOff && !tx.kind?.oneOff) {
@@ -188,23 +194,28 @@ function prettyPrintTransferFunds(tx: any, textFn: any) {
     elms.push(textFn(`**Reference**: ${tx.reference}`));
   }
 
+  await debug({ 1: 'ok' });
+
   if (
     tx.kind?.oneOff?.deliverOn !== null &&
     tx.kind?.oneOff?.deliverOn !== undefined &&
-    tx.kind?.oneOff?.deliverOn !== 0
+    tx.kind?.oneOff?.deliverOn !== BigInt(0)
   ) {
     elms.push(
-      textFn(`**Deliver On**: ${formatTimestamp(tx.kind.oneOff.deliverOn)}`),
+      textFn(
+        `**Deliver On**: ${formatTimestamp(Number(tx.kind.oneOff.deliverOn))}`,
+      ),
     );
   } else if (
     tx.oneOff?.deliverOn !== null &&
     tx.oneOff?.deliverOn !== undefined &&
-    tx.oneOff?.deliverOn !== 0
+    tx.oneOff?.deliverOn !== BigInt(0)
   ) {
     elms.push(
-      textFn(`**Deliver On**: ${formatTimestamp(tx.oneOff.deliverOn)}`),
+      textFn(`**Deliver On**: ${formatTimestamp(Number(tx.oneOff.deliverOn))}`),
     );
   }
+  await debug({ 2: 'ok' });
 
   return elms;
 }
@@ -238,12 +249,18 @@ function prettyPrintWithdrawSubmission(tx: any, textFn: any) {
  * @param textFn - The text function used for rendering.
  * @returns List of snap-ui elements.
  */
-function prettyPrintOrderSubmission(tx: any, textFn: any) {
+async function prettyPrintOrderSubmission(tx: any, textFn: any) {
   const elms = [];
   const isLimit = tx.type === 'TYPE_LIMIT';
   const side = getSide(tx.side);
 
-  if (tx.peggedOrder) {
+  await debug({
+    thing: JSON.stringify(tx, (_, v) =>
+      typeof v === 'bigint' ? v.toString() : v,
+    ),
+  });
+
+  if (tx.peggedOrder && Object.keys(tx.peggedOrder).length !== 0) {
     elms.push(
       textFn(
         `Pegged Limit ${side} - ${getTimeInForce(tx.timeInForce)} ${
@@ -270,8 +287,10 @@ function prettyPrintOrderSubmission(tx: any, textFn: any) {
   const marketId = minimiseId(tx.marketId);
   elms.push(textFn(`**Market ID**: ${marketId}`));
 
-  if (tx.expiresAt && tx.expiresAt > 0) {
-    elms.push(textFn(`**Expires At**: ${formatTimestamp(tx.expiresAt)}`));
+  if (tx.expiresAt && tx.expiresAt > BigInt(0)) {
+    elms.push(
+      textFn(`**Expires At**: ${formatTimestamp(Number(tx.expiresAt))}`),
+    );
   }
 
   if (tx.postOnly) {
@@ -282,7 +301,7 @@ function prettyPrintOrderSubmission(tx: any, textFn: any) {
     elms.push(textFn(`**Reduce Only**: yes`));
   }
 
-  if (tx.icebergOpts) {
+  if (tx.icebergOpts && Object.keys(tx.icebergOpts).length !== 0) {
     elms.push(textFn(`**Iceberg Peak Size**: ${tx.icebergOpts.peakSize}`));
     elms.push(
       textFn(
@@ -301,11 +320,16 @@ function prettyPrintOrderSubmission(tx: any, textFn: any) {
  * @param textFn - The test function used for rendering.
  * @returns List of snap-ui elements.
  */
-function prettyPrintOrderAmendment(tx: any, textFn: any) {
+async function prettyPrintOrderAmendment(tx: any, textFn: any) {
   const elms = [
     textFn(`**Order ID**: ${minimiseId(tx.orderId)}`),
     textFn(`**Market ID**: ${minimiseId(tx.marketId)}`),
   ];
+  await debug({
+    thing: JSON.stringify(tx, (_, v) =>
+      typeof v === 'bigint' ? v.toString() : v,
+    ),
+  });
 
   if (tx.price !== undefined && tx.price !== null && tx.price !== '') {
     elms.push(textFn(`**Price**: ${tx.price}`));
@@ -314,7 +338,7 @@ function prettyPrintOrderAmendment(tx: any, textFn: any) {
   if (
     tx.sizeDelta !== undefined &&
     tx.sizeDelta !== null &&
-    tx.sizeDelta !== 0
+    tx.sizeDelta !== BigInt(0)
   ) {
     if (tx.sizeDelta > 0) {
       elms.push(textFn(`**Size Delta**: +${tx.sizeDelta}`));
@@ -326,14 +350,17 @@ function prettyPrintOrderAmendment(tx: any, textFn: any) {
   if (
     tx.expiresAt !== undefined &&
     tx.expiresAt !== null &&
-    tx.expiresAt !== 0
+    tx.expiresAt !== BigInt(0)
   ) {
-    elms.push(textFn(`**Expires At**: ${formatTimestamp(tx.expiresAt)}`));
+    elms.push(
+      textFn(`**Expires At**: ${formatTimestamp(Number(tx.expiresAt))}`),
+    );
   }
 
   if (
     tx.timeInForce !== undefined &&
     tx.timeInForce !== null &&
+    tx.timeInForce !== 0 &&
     tx.timeInForce !== ''
   ) {
     elms.push(textFn(`**Time In Force**: ${getTimeInForce(tx.timeInForce)}`));
@@ -342,7 +369,8 @@ function prettyPrintOrderAmendment(tx: any, textFn: any) {
   if (
     tx.peggedReference !== undefined &&
     tx.peggedReference !== null &&
-    tx.peggededReference !== ''
+    tx.peggedReference !== 0 &&
+    tx.peggedReference !== ''
   ) {
     elms.push(
       textFn(`**Pegged Reference**: ${getPeggedReference(tx.peggedReference)}`),
@@ -352,7 +380,7 @@ function prettyPrintOrderAmendment(tx: any, textFn: any) {
   if (
     tx.peggedOffset !== undefined &&
     tx.peggedOffset !== null &&
-    tx.peggededOffset !== ''
+    tx.peggedOffset !== ''
   ) {
     elms.push(textFn(`**Pegged Offset**: ${tx.peggedOffset}`));
   }
@@ -427,7 +455,7 @@ function getSide(side: string) {
  * @param tx - The transaction.
  * @returns List of snap-ui elements.
  */
-function prettyPrintBatchMarketInstructions(tx: any) {
+async function prettyPrintBatchMarketInstructions(tx: any) {
   const elms = [];
   let addDivider = false;
 
@@ -435,7 +463,7 @@ function prettyPrintBatchMarketInstructions(tx: any) {
     elms.push(text(`**Order Cancellations:**`));
     for (const [i, c] of tx.cancellations.entries()) {
       elms.push(text(`__${i + 1}:__`));
-      elms.push(...prettyPrintTx({ orderCancellation: c }, indentText));
+      elms.push(...(await prettyPrintTx({ orderCancellation: c }, indentText)));
     }
     addDivider = true;
   }
@@ -447,7 +475,7 @@ function prettyPrintBatchMarketInstructions(tx: any) {
     elms.push(text(`**Order Amendments:**`));
     for (const [i, c] of tx.amendments.entries()) {
       elms.push(text(`__${i + 1}:__`));
-      elms.push(...prettyPrintTx({ orderAmendment: c }, indentText));
+      elms.push(...(await prettyPrintTx({ orderAmendment: c }, indentText)));
     }
     addDivider = true;
   }
@@ -459,7 +487,7 @@ function prettyPrintBatchMarketInstructions(tx: any) {
     elms.push(text(`**Order Submissions:**`));
     for (const [i, c] of tx.submissions.entries()) {
       elms.push(text(`__${i + 1}:__`));
-      elms.push(...prettyPrintTx({ orderSubmission: c }, indentText));
+      elms.push(...(await prettyPrintTx({ orderSubmission: c }, indentText)));
     }
   }
 
