@@ -2,7 +2,7 @@ import { OnRpcRequestHandler, JsonRpcRequest } from '@metamask/snaps-types';
 import rpc from './node-rpc';
 import * as txs from './transaction';
 import { deriveKeyPair } from './keys';
-import { reviewTransaction } from './ui';
+import { reviewTransaction, transactionTitle } from './ui';
 import {
   invalidParameters,
   JSONRPCError,
@@ -77,9 +77,21 @@ async function sendTransaction(origin: string, request: JsonRpcRequest) {
   const node = await rpc.findHealthyNode(
     networkEndpoints.map((u) => new URL(u)),
   );
+
+  // calling this function here as it will throw
+  // appropriate errors if the transaction is empty,
+  // or not containing an existing supported command.
+  transactionTitle(transaction);
+
+  const sanitizedTransaction = await txs.sanitizeCommand(transaction);
+
   // Transaction validation is somewhat handled down in this function.
   // Could be improved and made more explicit.
-  const approved = await reviewTransaction(origin, transaction, node.getURL());
+  const approved = await reviewTransaction(
+    origin,
+    sanitizedTransaction,
+    node.getURL(),
+  );
 
   if (approved !== true) {
     throw transactionDenied();

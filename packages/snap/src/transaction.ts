@@ -42,6 +42,25 @@ export async function send(node, transaction, sendingMode, publicKey) {
 }
 
 /**
+ * Sanitize a Vega command by encoding and decoding it. Will
+ * Remove all unexpected field from the user payload.
+ *
+ * @param command - The command to be sanitized.
+ * @returns The sanitized command.
+ */
+export async function sanitizeCommand(command) {
+  const inputData = InputData.encode({
+    command,
+  });
+
+  if (inputData === null) {
+    return null;
+  }
+
+  return InputData.decode(inputData).command;
+}
+
+/**
  * Helper to encode input data for a transaction, with a random nonce.
  *
  * @param command - The command to encode.

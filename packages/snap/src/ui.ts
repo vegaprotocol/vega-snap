@@ -24,7 +24,11 @@ export async function reviewTransaction(
     text(`Selected network entrypoint: ${selectedNetworkEntrypoint.origin}`),
     divider(),
     text('Raw transaction:'),
-    copyable(JSON.stringify(transaction, null, 2)),
+    copyable(
+      JSON.stringify(transaction, (_, v) =>
+        typeof v === 'bigint' ? v.toString() : v,
+      ),
+    ),
   ]);
 
   return snap.request({
@@ -49,7 +53,9 @@ export async function debug(obj: any) {
     ...prettyPrint(obj),
     divider(),
     text('Raw data:'),
-    copyable(JSON.stringify(obj, null, 2)),
+    copyable(
+      JSON.stringify(obj, (_, v) => (typeof v === 'bigint' ? v.toString() : v)),
+    ),
   ]);
 
   return snap.request({
@@ -191,18 +197,20 @@ function prettyPrintTransferFunds(tx: any, textFn: any) {
   if (
     tx.kind?.oneOff?.deliverOn !== null &&
     tx.kind?.oneOff?.deliverOn !== undefined &&
-    tx.kind?.oneOff?.deliverOn !== 0
+    tx.kind?.oneOff?.deliverOn !== BigInt(0)
   ) {
     elms.push(
-      textFn(`**Deliver On**: ${formatTimestamp(tx.kind.oneOff.deliverOn)}`),
+      textFn(
+        `**Deliver On**: ${formatTimestamp(Number(tx.kind.oneOff.deliverOn))}`,
+      ),
     );
   } else if (
     tx.oneOff?.deliverOn !== null &&
     tx.oneOff?.deliverOn !== undefined &&
-    tx.oneOff?.deliverOn !== 0
+    tx.oneOff?.deliverOn !== BigInt(0)
   ) {
     elms.push(
-      textFn(`**Deliver On**: ${formatTimestamp(tx.oneOff.deliverOn)}`),
+      textFn(`**Deliver On**: ${formatTimestamp(Number(tx.oneOff.deliverOn))}`),
     );
   }
 
@@ -243,7 +251,7 @@ function prettyPrintOrderSubmission(tx: any, textFn: any) {
   const isLimit = tx.type === 'TYPE_LIMIT';
   const side = getSide(tx.side);
 
-  if (tx.peggedOrder) {
+  if (tx.peggedOrder && Object.keys(tx.peggedOrder).length !== 0) {
     elms.push(
       textFn(
         `Pegged Limit ${side} - ${getTimeInForce(tx.timeInForce)} ${
@@ -270,8 +278,10 @@ function prettyPrintOrderSubmission(tx: any, textFn: any) {
   const marketId = minimiseId(tx.marketId);
   elms.push(textFn(`**Market ID**: ${marketId}`));
 
-  if (tx.expiresAt && tx.expiresAt > 0) {
-    elms.push(textFn(`**Expires At**: ${formatTimestamp(tx.expiresAt)}`));
+  if (tx.expiresAt && tx.expiresAt > BigInt(0)) {
+    elms.push(
+      textFn(`**Expires At**: ${formatTimestamp(Number(tx.expiresAt))}`),
+    );
   }
 
   if (tx.postOnly) {
@@ -282,7 +292,7 @@ function prettyPrintOrderSubmission(tx: any, textFn: any) {
     elms.push(textFn(`**Reduce Only**: yes`));
   }
 
-  if (tx.icebergOpts) {
+  if (tx.icebergOpts && Object.keys(tx.icebergOpts).length !== 0) {
     elms.push(textFn(`**Iceberg Peak Size**: ${tx.icebergOpts.peakSize}`));
     elms.push(
       textFn(
@@ -314,7 +324,7 @@ function prettyPrintOrderAmendment(tx: any, textFn: any) {
   if (
     tx.sizeDelta !== undefined &&
     tx.sizeDelta !== null &&
-    tx.sizeDelta !== 0
+    tx.sizeDelta !== BigInt(0)
   ) {
     if (tx.sizeDelta > 0) {
       elms.push(textFn(`**Size Delta**: +${tx.sizeDelta}`));
@@ -326,14 +336,17 @@ function prettyPrintOrderAmendment(tx: any, textFn: any) {
   if (
     tx.expiresAt !== undefined &&
     tx.expiresAt !== null &&
-    tx.expiresAt !== 0
+    tx.expiresAt !== BigInt(0)
   ) {
-    elms.push(textFn(`**Expires At**: ${formatTimestamp(tx.expiresAt)}`));
+    elms.push(
+      textFn(`**Expires At**: ${formatTimestamp(Number(tx.expiresAt))}`),
+    );
   }
 
   if (
     tx.timeInForce !== undefined &&
     tx.timeInForce !== null &&
+    !isUnspecified(tx.timeInForce) &&
     tx.timeInForce !== ''
   ) {
     elms.push(textFn(`**Time In Force**: ${getTimeInForce(tx.timeInForce)}`));
@@ -342,7 +355,8 @@ function prettyPrintOrderAmendment(tx: any, textFn: any) {
   if (
     tx.peggedReference !== undefined &&
     tx.peggedReference !== null &&
-    tx.peggededReference !== ''
+    !isUnspecified(tx.peggedReference) &&
+    tx.peggedReference !== ''
   ) {
     elms.push(
       textFn(`**Pegged Reference**: ${getPeggedReference(tx.peggedReference)}`),
@@ -352,12 +366,22 @@ function prettyPrintOrderAmendment(tx: any, textFn: any) {
   if (
     tx.peggedOffset !== undefined &&
     tx.peggedOffset !== null &&
-    tx.peggededOffset !== ''
+    tx.peggedOffset !== ''
   ) {
     elms.push(textFn(`**Pegged Offset**: ${tx.peggedOffset}`));
   }
 
   return elms;
+}
+
+/**
+ * Check if a vega proto enum is the unspecified field.
+ *
+ * @param v - The field to check.
+ * @returns True if this v is an unspecified field.
+ */
+function isUnspecified(v: string) {
+  return v.endsWith('_UNSPECIFIED');
 }
 
 /**
@@ -368,6 +392,8 @@ function prettyPrintOrderAmendment(tx: any, textFn: any) {
  */
 function getPeggedReference(ref: string) {
   switch (ref) {
+    case 'PEGGED_REFERENCE_UNSPECIFIED':
+      return 'Unspecified';
     case 'PEGGED_REFERENCE_MID':
       return 'Mid';
     case 'PEGGED_REFERENCE_BEST_BID':
@@ -387,6 +413,8 @@ function getPeggedReference(ref: string) {
  */
 function getTimeInForce(tif: string) {
   switch (tif) {
+    case 'TIME_IN_FORCE_UNSPECIFIED':
+      return 'Unspecified';
     case 'TIME_IN_FORCE_GTC':
       return 'GTC';
     case 'TIME_IN_FORCE_GTT':
@@ -412,6 +440,8 @@ function getTimeInForce(tif: string) {
  */
 function getSide(side: string) {
   switch (side) {
+    case 'SIDE_UNSPECIFIED':
+      return 'Unspecified';
     case 'SIDE_BUY':
       return 'Buy';
     case 'SIDE_SELL':
@@ -523,7 +553,7 @@ function prettyPrint(obj: any) {
  * @param tx - Object with a single command property. Uusally the incoming `transaction` property from `client.send_transaction`.
  * @returns A human readable transaction title.
  */
-function transactionTitle(tx: any): string {
+export function transactionTitle(tx: any): string {
   const keys = Object.keys(tx);
 
   if (keys.length !== 1) {
