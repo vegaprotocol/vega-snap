@@ -147,9 +147,57 @@ function prettyPrintTx(tx: any, textFn: any) {
       return prettyPrintWithdrawSubmission(txContent, textFn);
     case 'transfer':
       return prettyPrintTransferFunds(txContent, textFn);
+    case 'createReferralSet':
+      return prettyPrintCreateReferralSet(txContent, textFn);
+    case 'applyReferralCode':
+      return prettyPrintApplyReferralCode(txContent, textFn);
+    case 'stopOrdersSubmission':
+      return prettyPrintStopOrdersSubmission(txContent, textFn);
+    case 'stopOrdersCancellation':
+      return prettyPrintStopOrdersCancellation(txContent, textFn);
     default:
       return prettyPrint(txContent);
   }
+}
+
+/**
+ * Pretty prints a create referral set transaction.
+ *
+ * @param tx - The create referral set transaction.
+ * @param textFn - The text function used for rendering.
+ * @returns List of snap-ui elements.
+ */
+function prettyPrintCreateReferralSet(tx: any, textFn: any) {
+  if (tx.isTeam === false) {
+    return [textFn(`Create a new referral set`)];
+  }
+
+  const elms = [textFn(`Create a new referral set and team`)];
+
+  if (tx.team !== null) {
+    elms.push(textFn(`**Name**: ${tx.team.name}`));
+
+    if (tx.team.teamUrl !== null) {
+      elms.push(textFn(`**Team URL**: ${tx.team.teamUrl}`));
+    }
+
+    elms.push(textFn(`**Closed**: ${tx.team.closed}`));
+  }
+
+  return elms;
+}
+
+/**
+ * Pretty prints an apply referral code transaction.
+ *
+ * @param tx - The apply referral code transaction.
+ * @param textFn - The text function used for rendering.
+ * @returns List of snap-ui elements.
+ */
+function prettyPrintApplyReferralCode(tx: any, textFn: any) {
+  const elms = [textFn(`Submit referral code: ${minimiseId(tx.id)}`)];
+
+  return elms;
 }
 
 /**
@@ -234,6 +282,96 @@ function prettyPrintWithdrawSubmission(tx: any, textFn: any) {
   if (tx.ext?.erc20?.receiverAddress) {
     elms.push(textFn(`**To Address**: `));
     elms.push(copyable(`${tx.ext?.erc20?.receiverAddress}`));
+  }
+
+  return elms;
+}
+
+/**
+ * Pretty print a Stop Order details.
+ *
+ * @param so - The stop order details.
+ * @param textFn - The text function used for rendering.
+ * @returns List of snap-ui elements.
+ */
+function prettyPrintStopOrderDetails(so: any, textFn: any) {
+  const elms = [];
+  if (so.trigger?.price !== null && so.trigger?.price !== undefined) {
+    elms.push(textFn(`Trigger price: ${so.trigger.price}`));
+  }
+
+  if (so.price !== null && so.price !== undefined) {
+    elms.push(textFn(`Trigger price: ${so.price}`));
+  }
+
+  if (
+    so.trigger?.trailingPercentOffset !== null &&
+    so.trigger?.trailingPercentOffset !== undefined
+  ) {
+    const offset = parseFloat(so.trigger.trailingPercentOffset) * 100;
+    elms.push(textFn(`Trailing offset: ${offset}%`));
+  }
+
+  if (
+    so.trailingPercentOffset !== null &&
+    so.trailingPercentOffset !== undefined
+  ) {
+    const offset = parseFloat(so.trigger.trailingPercentOffset) * 100;
+    elms.push(textFn(`Trailing offset: ${offset}%`));
+  }
+
+  if (so.expiresAt !== null && so.expiresAt !== undefined) {
+    elms.push(textFn(`Expires on: ${formatTimestamp(Number(so.expiresAt))}`));
+  }
+
+  if (so.expiryStrategy !== null && so.expiryStrategy !== undefined) {
+    elms.push(
+      textFn(`Expiry strategy: ${getExpiryStrategy(so.expiryStrategy)}`),
+    );
+  }
+
+  return elms;
+}
+
+/**
+ * Pretty print a Stop Orders Submission.
+ *
+ * @param tx - The order submission transaction.
+ * @param textFn - The text function used for rendering.
+ * @returns List of snap-ui elements.
+ */
+function prettyPrintStopOrdersSubmission(tx: any, textFn: any) {
+  const elms = [];
+  if (tx.risesAbove !== null && tx.risesAbove !== undefined) {
+    elms.push(textFn('**Rises Above**'));
+
+    elms.push(...prettyPrintStopOrderDetails(tx.risesAbove, textFn));
+
+    elms.push(
+      textFn('**Order details**'),
+      ...prettyPrintTx(
+        { orderSubmission: tx.risesAbove.orderSubmission },
+        indentText,
+      ),
+    );
+  }
+
+  if (tx.fallsBelow !== null && tx.fallsBelow !== undefined) {
+    if (tx.risesAbove !== null && tx.risesAbove !== undefined) {
+      elms.push(divider());
+    }
+
+    elms.push(textFn('**Falls Below**'));
+
+    elms.push(...prettyPrintStopOrderDetails(tx.fallsBelow, textFn));
+
+    elms.push(
+      textFn('**Order details**'),
+      ...prettyPrintTx(
+        { orderSubmission: tx.fallsBelow.orderSubmission },
+        indentText,
+      ),
+    );
   }
 
   return elms;
@@ -433,6 +571,25 @@ function getTimeInForce(tif: string) {
 }
 
 /**
+ * Gets a human readable string representing of an expiry strategy.
+ *
+ * @param st - The expiry strategy.
+ * @returns The human readable string.
+ */
+function getExpiryStrategy(st: string) {
+  switch (st) {
+    case 'EXPIRY_UNSPECIFIED':
+      return 'Unspecified';
+    case 'EXPIRY_STRATEGY_CANCELS':
+      return 'Cancels';
+    case 'EXPIRY_STRATEGY_SUBMIT':
+      return 'Submit';
+    default:
+      throw invalidParameters('Unknown Expiry Strategy');
+  }
+}
+
+/**
  * Gets a human readable string representing a side.
  *
  * @param side - The side.
@@ -493,6 +650,28 @@ function prettyPrintBatchMarketInstructions(tx: any) {
     }
   }
 
+  if (tx.stopOrdersCancellation && tx.stopOrdersCancellation.length > 0) {
+    if (addDivider) {
+      elms.push(divider());
+    }
+    elms.push(text(`**Stop Orders Cancellations:**`));
+    for (const [i, c] of tx.stopOrdersCancellation.entries()) {
+      elms.push(text(`__${i + 1}:__`));
+      elms.push(...prettyPrintTx({ stopOrdersCancellation: c }, indentText));
+    }
+  }
+
+  if (tx.stopOrdersSubmission && tx.stopOrdersSubmission.length > 0) {
+    if (addDivider) {
+      elms.push(divider());
+    }
+    elms.push(text(`**Stop Orders Submissions:**`));
+    for (const [i, c] of tx.stopOrdersSubmission.entries()) {
+      elms.push(text(`__${i + 1}:__`));
+      elms.push(...prettyPrintTx({ stopOrdersSubmission: c }, indentText));
+    }
+  }
+
   return elms;
 }
 
@@ -527,6 +706,38 @@ function prettyPrintCancelOrder(tx: any, textFn: any) {
 }
 
 /**
+ * Pretty print a cancel stop order transaction.
+ *
+ * @param tx - The cancel stop order transaction.
+ * @param textFn - The text function used for rendering.
+ * @returns List of snap-ui elements.
+ */
+function prettyPrintStopOrdersCancellation(tx: any, textFn: any) {
+  const hasOrderId =
+    tx.orderId !== undefined &&
+    tx.stopOrderId !== null &&
+    tx.stopOrderId !== '';
+  const hasMarketId =
+    tx.marketId !== undefined && tx.marketId !== null && tx.marketId !== '';
+
+  if (hasOrderId && hasMarketId) {
+    return [
+      textFn(`Cancel stop order`),
+      textFn(`**Stop Order ID**: ${minimiseId(tx.stopOrderId)}`),
+      textFn(`**Market ID**: ${minimiseId(tx.marketId)}`),
+    ];
+  } else if (hasOrderId) {
+    return [textFn(`Cancel stop order ${minimiseId(tx.stopOrderId)}`)];
+  } else if (hasMarketId) {
+    return [
+      textFn(`Cancel all stop orders on market`),
+      textFn(`**Market ID**: ${minimiseId(tx.marketId)}`),
+    ];
+  }
+  return [textFn(`Cancel all stop orders from all markets`)];
+}
+
+/**
  * Recurively pretty prints an object as snap-ui elements.
  *
  * @param obj - Object to pretty print. Primitives will be coerced to strings, while objects will be recursed into.
@@ -535,8 +746,14 @@ function prettyPrintCancelOrder(tx: any, textFn: any) {
 function prettyPrint(obj: any) {
   const elms = [];
 
+  if (obj === null || obj === undefined) {
+    return [text(`**Empty transaction provided**`)];
+  }
+
   for (const [key, val] of Object.entries(obj)) {
-    if (typeof val === 'object') {
+    if (val === null || val === undefined) {
+      elms.push(text(`**${key}**: empty value`));
+    } else if (typeof val === 'object') {
       elms.push(text(`**${key}**: `));
       elms.push(...prettyPrint(val));
     } else {

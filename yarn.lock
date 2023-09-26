@@ -6930,13 +6930,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vegaprotocol/protos@npm:^0.7.2":
-  version: 0.7.2
-  resolution: "@vegaprotocol/protos@npm:0.7.2"
+"@vegaprotocol/protos@npm:^0.8.0":
+  version: 0.8.0
+  resolution: "@vegaprotocol/protos@npm:0.8.0"
   dependencies:
     protobuf-codec: ^2.0.1
     type-fest: ^3.6.0
-  checksum: 05209a2915aa4b1b8d50f2bd0ef9df7944f537531657319bee7df47c972499a55e510f70cd591c3e9635b142db5375a43269e690563e49f5976a731d92311d02
+  checksum: 22a9dc31763d5a1ce3d156e33ca8b4680c5eb5557c17e0c8529035b9052b8a96b317958184ac128e3c9d96f23d9545016a0bd80b95ec9c03f4ab736bd2f85cda
   languageName: node
   linkType: hard
 
@@ -6982,7 +6982,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": ^5.33.0
     "@typescript-eslint/parser": ^5.33.0
     "@vegaprotocol/crypto": ^0.11.0
-    "@vegaprotocol/protos": ^0.7.2
+    "@vegaprotocol/protos": ^0.8.0
     buffer: ^6.0.3
     eslint: ^8.21.0
     eslint-config-prettier: ^8.1.0
