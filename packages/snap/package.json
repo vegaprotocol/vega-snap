@@ -1,6 +1,6 @@
 {
   "name": "@vegaprotocol/snap",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Vega Metamask Snap that adds Vega support for Metamask",
   "homepage": "https://github.com/vegaprotocol/vega-snap#readme",
   "bugs": {
