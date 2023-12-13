@@ -832,6 +832,12 @@ export function transactionTitle(tx: any): string {
       return 'Issue signatures';
     case 'oracleDataSubmission':
       return 'Oracle data submission';
+    case 'createReferralSet':
+      return 'Create referral set';
+    case 'updateReferralSet':
+      return 'Update referral set';
+    case 'applyReferralCode':
+      return 'Apply referral code';
     default:
       throw invalidParameters('Unknown transaction type');
   }
