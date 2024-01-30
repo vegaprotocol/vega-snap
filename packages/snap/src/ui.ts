@@ -496,6 +496,18 @@ function prettyPrintOrderAmendment(tx: any, textFn: any) {
   }
 
   if (
+    tx.size !== undefined &&
+    tx.size !== null &&
+    tx.size !== BigInt(0)
+  ) {
+    if (tx.size > 0) {
+      elms.push(textFn(`**Size**: +${tx.size}`));
+    } else {
+      elms.push(textFn(`**Size**: ${tx.size}`));
+    }
+  }
+
+  if (
     tx.expiresAt !== undefined &&
     tx.expiresAt !== null &&
     tx.expiresAt !== BigInt(0)
