@@ -151,6 +151,8 @@ function prettyPrintTx(tx: any, textFn: any) {
       return prettyPrintCreateReferralSet(txContent, textFn);
     case 'applyReferralCode':
       return prettyPrintApplyReferralCode(txContent, textFn);
+    case 'joinTeam':
+      return prettyPrintJoinTeam(txContent, textFn);
     case 'stopOrdersSubmission':
       return prettyPrintStopOrdersSubmission(txContent, textFn);
     case 'stopOrdersCancellation':
@@ -220,6 +222,19 @@ function prettyPrintCreateReferralSet(tx: any, textFn: any) {
  */
 function prettyPrintApplyReferralCode(tx: any, textFn: any) {
   const elms = [textFn(`Submit referral code: ${minimiseId(tx.id)}`)];
+
+  return elms;
+}
+
+/**
+ * Pretty prints a join team transaction.
+ *
+ * @param tx - The join team transaction.
+ * @param textFn - The text function used for rendering.
+ * @returns List of snap-ui elements.
+ */
+function prettyPrintJoinTeam(tx: any, textFn: any) {
+  const elms = [textFn(`Join team: ${minimiseId(tx.id)}`)];
 
   return elms;
 }
