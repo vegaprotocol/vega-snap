@@ -207,7 +207,19 @@ function prettyPrintCreateReferralSet(tx: any, textFn: any) {
       elms.push(textFn(`**Team URL**: ${tx.team.teamUrl}`));
     }
 
+    if (tx.team.avatarUrl !== null) {
+      elms.push(textFn(`**Avatar URL**: ${tx.team.avatarUrl}`));
+    }
+
     elms.push(textFn(`**Closed**: ${tx.team.closed}`));
+
+    if (Array.isArray(tx.team.allowList) && tx.team.allowList.length > 0) {
+	elms.push(textFn(`**Allow list**:`));
+	for (var i = 0; i < tx.team.allowList.length; i++) {
+	    const id = minimiseId(tx.team.allowList[i]);
+	    elms.push(indentText(id));
+	}
+    }
   }
 
   return elms;
