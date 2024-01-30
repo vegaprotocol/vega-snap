@@ -17,6 +17,7 @@ import {
  */
 async function listKeys() {
     const keys = [];
+
     // always generate the 11 first keys
     for (let i = 0; i < 11; i++) {
 	const keyPair = await deriveKeyPair(i);

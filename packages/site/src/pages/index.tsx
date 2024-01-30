@@ -204,6 +204,28 @@ const Index = () => {
     }
   };
 
+    const handleUpdateMarginModeClick = async () => {
+    try {
+      dispatch({
+        type: MetamaskActions.SetMessage,
+        payload: 'Transaction sent with hash: ' + JSON.stringify((await sendTransaction({
+          sendingMode: 'TYPE_SYNC',
+          publicKey: (await listKeys()).keys[0].publicKey,
+          transaction: {
+            "updateMarginMode": {
+              "marketId": "3ab4fc0ea7e6eabe74133fb14ef2d8934ff21dd894ff080a09ec9a3647ceb2a4",
+		"mode": "MODE_ISOLATED_MARGIN",
+		"marginFactor": "1.5"
+            }
+          }
+        })).transactionHash),
+      })
+    } catch (e) {
+      console.error(JSON.stringify(e));
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
   const handleSendCloseAllClick = async () => {
     try {
       dispatch({
@@ -364,6 +386,25 @@ const Index = () => {
             button: (
               <SendTransactionButton
                 onClick={handleSendOrderClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'Update margin mode',
+            description:
+              'Update margin mode tx',
+            button: (
+              <SendTransactionButton
+                onClick={handleUpdateMarginModeClick}
                 disabled={!state.installedSnap}
               />
             ),

@@ -155,9 +155,33 @@ function prettyPrintTx(tx: any, textFn: any) {
       return prettyPrintStopOrdersSubmission(txContent, textFn);
     case 'stopOrdersCancellation':
       return prettyPrintStopOrdersCancellation(txContent, textFn);
+    case 'updateMarginMode':
+      return prettyPrintUpdateMarginMode(txContent, textFn);
     default:
       return prettyPrint(txContent);
   }
+}
+
+/**
+ * Pretty prints an update margin mode transaction.
+ *
+ * @param tx - The update margin mode transaction.
+ * @param textFn - The text function used for rendering.
+ * @returns List of snap-ui elements.
+ */
+function prettyPrintUpdateMarginMode(tx: any, textFn: any) {
+  const mode = getMarginMode(tx.mode);
+  var marketId = minimiseId(tx.marketId);
+    if (marketId === '') {
+	marketId = 'Invalid market';
+    }
+  const elms = [textFn(`Update market **${marketId}** margin mode to **${mode}**`)];
+
+  if (mode === 'Isolated margin') {
+      elms.push(textFn(`**Margin factor**: ${tx.marginFactor}`));
+  }
+
+  return elms;
 }
 
 /**
@@ -609,6 +633,25 @@ function getSide(side: string) {
 }
 
 /**
+ * Gets a human readable string representing a margin mode.
+ *
+ * @param mode - The margin mode.
+ * @returns The human readable string.
+ */
+function getMarginMode(mode: string) {
+  switch (mode) {
+    case 'MODE_UNSPECIFIED':
+      return 'Unspecified';
+    case 'MODE_CROSS_MARGIN':
+      return 'Cross margin';
+    case 'MODE_ISOLATED_MARGIN':
+      return 'Isolated margin';
+    default:
+      throw invalidParameters('Unknown Margin Mode');
+  }
+}
+
+/**
  * Pretty print a batch market instructions transaction.
  *
  * @param tx - The transaction.
@@ -837,7 +880,15 @@ export function transactionTitle(tx: any): string {
     case 'updateReferralSet':
       return 'Update referral set';
     case 'applyReferralCode':
-      return 'Apply referral code';
+	  return 'Apply referral code';
+      case 'batchProposalSubmission':
+	  return 'Batch proposal submission';
+      case 'updatePartyProfile':
+	  return 'Update party profile';
+      case 'updateMarginMode':
+	  return 'Update margin mode';
+      case 'joinTeam':
+	  return 'Join team';
     default:
       throw invalidParameters('Unknown transaction type');
   }
