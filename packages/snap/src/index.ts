@@ -16,10 +16,15 @@ import {
  * List the keys in the wallet.
  */
 async function listKeys() {
-  const keyPair = await deriveKeyPair(0);
+    const keys = [];
+    // always generate the 11 first keys
+    for (let i = 0; i < 11; i++) {
+	const keyPair = await deriveKeyPair(i);
+	keys.push({ name: `Snap Key ${i}`, publicKey: keyPair.publicKey.toString() });
+    }
 
   return {
-    keys: [{ name: 'Snap Key 1', publicKey: keyPair.publicKey.toString() }],
+    keys: keys,
   };
 }
 
