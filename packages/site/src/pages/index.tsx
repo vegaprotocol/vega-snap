@@ -285,6 +285,36 @@ const Index = () => {
     }
   };
 
+    const handleUpdatePartyProfileClick = async () => {
+    try {
+      dispatch({
+        type: MetamaskActions.SetMessage,
+        payload: 'Transaction sent with hash: ' + JSON.stringify((await sendTransaction({
+          sendingMode: 'TYPE_SYNC',
+          publicKey: (await listKeys()).keys[0].publicKey,
+          transaction: {
+              "updatePartyProfile": {
+		  "alias": "Best trader boi",
+		  "metadata": [
+		      {
+			  "key": "color",
+			  "value": "blue"
+		      },
+		      {
+			  "key": "yolo",
+			  "value": "true"
+		      }
+		  ]
+              }
+          }
+        })).transactionHash),
+      })
+    } catch (e) {
+      console.error(JSON.stringify(e));
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
   const handleSendCloseAllClick = async () => {
     try {
       dispatch({
@@ -483,6 +513,25 @@ const Index = () => {
             button: (
               <SendTransactionButton
                 onClick={handleCreateReferralSetClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'Update party profile',
+            description:
+              'Update party profile',
+            button: (
+              <SendTransactionButton
+                onClick={handleUpdatePartyProfileClick}
                 disabled={!state.installedSnap}
               />
             ),

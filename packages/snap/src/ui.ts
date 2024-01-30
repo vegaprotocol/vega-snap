@@ -161,6 +161,8 @@ function prettyPrintTx(tx: any, textFn: any) {
       return prettyPrintStopOrdersCancellation(txContent, textFn);
     case 'updateMarginMode':
       return prettyPrintUpdateMarginMode(txContent, textFn);
+    case 'updatePartyProfile':
+      return prettyPrintUpdatePartyProfile(txContent, textFn);
     default:
       return prettyPrint(txContent);
   }
@@ -184,6 +186,29 @@ function prettyPrintUpdateMarginMode(tx: any, textFn: any) {
   if (mode === 'Isolated margin') {
       elms.push(textFn(`**Margin factor**: ${tx.marginFactor}`));
   }
+
+  return elms;
+}
+
+/**
+ * Pretty prints an update party profile transaction.
+ *
+ * @param tx - The update margin mode transaction.
+ * @param textFn - The text function used for rendering.
+ * @returns List of snap-ui elements.
+ */
+function prettyPrintUpdatePartyProfile(tx: any, textFn: any) {
+  const elms = [];
+    if (tx.alias !== null) {
+	elms.push(textFn(`**Alias**: ${tx.alias}`));
+    }
+
+    if (Array.isArray(tx.metadata) && tx.metadata.length > 0) {
+	elms.push(textFn(`**Meta data**:`));
+	for (var i = 0; i < tx.metadata.length; i++) {
+	    elms.push(indentText(`**${tx.metadata[i].key}**: ${tx.metadata[i].key}`));
+	}
+    }
 
   return elms;
 }
