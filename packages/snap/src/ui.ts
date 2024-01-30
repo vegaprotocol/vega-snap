@@ -149,6 +149,8 @@ function prettyPrintTx(tx: any, textFn: any) {
       return prettyPrintTransferFunds(txContent, textFn);
     case 'createReferralSet':
       return prettyPrintCreateReferralSet(txContent, textFn);
+    case 'updateReferralSet':
+      return prettyPrintUpdateReferralSet(txContent, textFn);
     case 'applyReferralCode':
       return prettyPrintApplyReferralCode(txContent, textFn);
     case 'joinTeam':
@@ -212,6 +214,51 @@ function prettyPrintCreateReferralSet(tx: any, textFn: any) {
     }
 
     elms.push(textFn(`**Closed**: ${tx.team.closed}`));
+
+    if (Array.isArray(tx.team.allowList) && tx.team.allowList.length > 0) {
+	elms.push(textFn(`**Allow list**:`));
+	for (var i = 0; i < tx.team.allowList.length; i++) {
+	    const id = minimiseId(tx.team.allowList[i]);
+	    elms.push(indentText(id));
+	}
+    }
+  }
+
+  return elms;
+}
+
+/**
+ * Pretty prints an update referral set transaction.
+ *
+ * @param tx - The update referral set transaction.
+ * @param textFn - The text function used for rendering.
+ * @returns List of snap-ui elements.
+ */
+function prettyPrintUpdateReferralSet(tx: any, textFn: any) {
+  const id = minimiseId(tx.id);
+
+    if (tx.isTeam === false) {
+      return [textFn(`Update referral set ${id}`)];
+  }
+
+  const elms = [textFn(`Update referral set and team ${id}`)];
+
+  if (tx.team !== null) {
+    if (tx.team.name !== null) {
+	elms.push(textFn(`**Name**: ${tx.team.name}`));
+    }
+
+    if (tx.team.teamUrl !== null) {
+      elms.push(textFn(`**Team URL**: ${tx.team.teamUrl}`));
+    }
+
+    if (tx.team.avatarUrl !== null) {
+      elms.push(textFn(`**Avatar URL**: ${tx.team.avatarUrl}`));
+    }
+
+    if (tx.team.closed !== null) {
+	elms.push(textFn(`**Closed**: ${tx.team.closed}`));
+    }
 
     if (Array.isArray(tx.team.allowList) && tx.team.allowList.length > 0) {
 	elms.push(textFn(`**Allow list**:`));

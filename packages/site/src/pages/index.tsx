@@ -255,6 +255,36 @@ const Index = () => {
     }
   };
 
+    const handleUpdateReferralSetClick = async () => {
+    try {
+      dispatch({
+        type: MetamaskActions.SetMessage,
+        payload: 'Transaction sent with hash: ' + JSON.stringify((await sendTransaction({
+          sendingMode: 'TYPE_SYNC',
+          publicKey: (await listKeys()).keys[0].publicKey,
+          transaction: {
+            "updateReferralSet": {
+		"id": "3ab4fc0ea7e6eabe74133fb14ef2d8934ff21dd894ff080a09ec9a3647ceb2a4",
+		"isTeam": true,
+		"team": {
+		    "name": "yolo bois",
+		    "teamUrl": "https://yolo.boi",
+		    "closed": true,
+		     "allowList": [
+		     	"3ab4fc0ea7e6eabe74133fb14ef2d8934ff21dd894ff080a09ec9a3647ceb2a4",
+		     	"e6561f69c2a76858866aab2896eeb529b46040614566e0665602d67bc682c31f"
+		     ]
+		},
+            }
+          }
+        })).transactionHash),
+      })
+    } catch (e) {
+      console.error(JSON.stringify(e));
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
   const handleSendCloseAllClick = async () => {
     try {
       dispatch({
@@ -453,6 +483,25 @@ const Index = () => {
             button: (
               <SendTransactionButton
                 onClick={handleCreateReferralSetClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
+        <Card
+          content={{
+            title: 'Update referral set',
+            description:
+              'Update referral set',
+            button: (
+              <SendTransactionButton
+                onClick={handleUpdateReferralSetClick}
                 disabled={!state.installedSnap}
               />
             ),
