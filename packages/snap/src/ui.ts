@@ -208,7 +208,7 @@ function prettyPrintUpdatePartyProfile(tx: any, textFn: any) {
   if (Array.isArray(tx.metadata) && tx.metadata.length > 0) {
     elms.push(textFn(`**Meta data**:`));
     for (const e of tx.metadata) {
-      if (e !== null || e !== undefined) {
+      if (e !== null && e !== undefined) {
         elms.push(indentText(`**${e.key}**: ${e.value}`));
       }
     }
@@ -247,7 +247,7 @@ function prettyPrintCreateReferralSet(tx: any, textFn: any) {
     if (Array.isArray(tx.team.allowList) && tx.team.allowList.length > 0) {
       elms.push(textFn(`**Allow list**:`));
       for (const e of tx.team.allowList) {
-        if (e !== null || e !== undefined) {
+        if (e !== null && e !== undefined) {
           const id = minimiseId(e);
           elms.push(indentText(id));
         }
@@ -294,7 +294,7 @@ function prettyPrintUpdateReferralSet(tx: any, textFn: any) {
     if (Array.isArray(tx.team.allowList) && tx.team.allowList.length > 0) {
       elms.push(textFn(`**Allow list**:`));
       for (const e of tx.team.allowList) {
-        if (e !== null || e !== undefined) {
+        if (e !== null && e !== undefined) {
           const allowedId = minimiseId(e);
           elms.push(indentText(allowedId));
         }
