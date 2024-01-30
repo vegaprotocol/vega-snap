@@ -177,14 +177,16 @@ function prettyPrintTx(tx: any, textFn: any) {
  */
 function prettyPrintUpdateMarginMode(tx: any, textFn: any) {
   const mode = getMarginMode(tx.mode);
-  var marketId = minimiseId(tx.marketId);
-    if (marketId === '') {
-	marketId = 'Invalid market';
-    }
-  const elms = [textFn(`Update market **${marketId}** margin mode to **${mode}**`)];
+  let marketId = minimiseId(tx.marketId);
+  if (marketId === '') {
+    marketId = 'Invalid market';
+  }
+  const elms = [
+    textFn(`Update market **${marketId}** margin mode to **${mode}**`),
+  ];
 
   if (mode === 'Isolated margin') {
-      elms.push(textFn(`**Margin factor**: ${tx.marginFactor}`));
+    elms.push(textFn(`**Margin factor**: ${tx.marginFactor}`));
   }
 
   return elms;
@@ -199,16 +201,18 @@ function prettyPrintUpdateMarginMode(tx: any, textFn: any) {
  */
 function prettyPrintUpdatePartyProfile(tx: any, textFn: any) {
   const elms = [];
-    if (tx.alias !== null) {
-	elms.push(textFn(`**Alias**: ${tx.alias}`));
-    }
+  if (tx.alias !== null) {
+    elms.push(textFn(`**Alias**: ${tx.alias}`));
+  }
 
-    if (Array.isArray(tx.metadata) && tx.metadata.length > 0) {
-	elms.push(textFn(`**Meta data**:`));
-	for (var i = 0; i < tx.metadata.length; i++) {
-	    elms.push(indentText(`**${tx.metadata[i].key}**: ${tx.metadata[i].key}`));
-	}
+  if (Array.isArray(tx.metadata) && tx.metadata.length > 0) {
+    elms.push(textFn(`**Meta data**:`));
+    for (const e of tx.metadata) {
+      if (e !== null || e !== undefined) {
+        elms.push(indentText(`**${e.key}**: ${e.value}`));
+      }
     }
+  }
 
   return elms;
 }
@@ -241,11 +245,13 @@ function prettyPrintCreateReferralSet(tx: any, textFn: any) {
     elms.push(textFn(`**Closed**: ${tx.team.closed}`));
 
     if (Array.isArray(tx.team.allowList) && tx.team.allowList.length > 0) {
-	elms.push(textFn(`**Allow list**:`));
-	for (var i = 0; i < tx.team.allowList.length; i++) {
-	    const id = minimiseId(tx.team.allowList[i]);
-	    elms.push(indentText(id));
-	}
+      elms.push(textFn(`**Allow list**:`));
+      for (const e of tx.team.allowList) {
+        if (e !== null || e !== undefined) {
+          const id = minimiseId(e);
+          elms.push(indentText(id));
+        }
+      }
     }
   }
 
@@ -262,15 +268,15 @@ function prettyPrintCreateReferralSet(tx: any, textFn: any) {
 function prettyPrintUpdateReferralSet(tx: any, textFn: any) {
   const id = minimiseId(tx.id);
 
-    if (tx.isTeam === false) {
-      return [textFn(`Update referral set ${id}`)];
+  if (tx.isTeam === false) {
+    return [textFn(`Update referral set ${id}`)];
   }
 
   const elms = [textFn(`Update referral set and team ${id}`)];
 
   if (tx.team !== null) {
     if (tx.team.name !== null) {
-	elms.push(textFn(`**Name**: ${tx.team.name}`));
+      elms.push(textFn(`**Name**: ${tx.team.name}`));
     }
 
     if (tx.team.teamUrl !== null) {
@@ -282,15 +288,17 @@ function prettyPrintUpdateReferralSet(tx: any, textFn: any) {
     }
 
     if (tx.team.closed !== null) {
-	elms.push(textFn(`**Closed**: ${tx.team.closed}`));
+      elms.push(textFn(`**Closed**: ${tx.team.closed}`));
     }
 
     if (Array.isArray(tx.team.allowList) && tx.team.allowList.length > 0) {
-	elms.push(textFn(`**Allow list**:`));
-	for (var i = 0; i < tx.team.allowList.length; i++) {
-	    const id = minimiseId(tx.team.allowList[i]);
-	    elms.push(indentText(id));
-	}
+      elms.push(textFn(`**Allow list**:`));
+      for (const e of tx.team.allowList) {
+        if (e !== null || e !== undefined) {
+          const allowedId = minimiseId(e);
+          elms.push(indentText(allowedId));
+        }
+      }
     }
   }
 
@@ -594,11 +602,7 @@ function prettyPrintOrderAmendment(tx: any, textFn: any) {
     }
   }
 
-  if (
-    tx.size !== undefined &&
-    tx.size !== null &&
-    tx.size !== BigInt(0)
-  ) {
+  if (tx.size !== undefined && tx.size !== null && tx.size !== BigInt(0)) {
     if (tx.size > 0) {
       elms.push(textFn(`**Size**: +${tx.size}`));
     } else {
@@ -826,7 +830,7 @@ function prettyPrintBatchMarketInstructions(tx: any) {
     }
   }
 
-    if (tx.updateMarginMode && tx.updateMarginMode.length > 0) {
+  if (tx.updateMarginMode && tx.updateMarginMode.length > 0) {
     if (addDivider) {
       elms.push(divider());
     }
@@ -1002,15 +1006,15 @@ export function transactionTitle(tx: any): string {
     case 'updateReferralSet':
       return 'Update referral set';
     case 'applyReferralCode':
-	  return 'Apply referral code';
-      case 'batchProposalSubmission':
-	  return 'Batch proposal submission';
-      case 'updatePartyProfile':
-	  return 'Update party profile';
-      case 'updateMarginMode':
-	  return 'Update margin mode';
-      case 'joinTeam':
-	  return 'Join team';
+      return 'Apply referral code';
+    case 'batchProposalSubmission':
+      return 'Batch proposal submission';
+    case 'updatePartyProfile':
+      return 'Update party profile';
+    case 'updateMarginMode':
+      return 'Update margin mode';
+    case 'joinTeam':
+      return 'Join team';
     default:
       throw invalidParameters('Unknown transaction type');
   }
