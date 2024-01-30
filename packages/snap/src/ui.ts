@@ -727,6 +727,17 @@ function prettyPrintBatchMarketInstructions(tx: any) {
     }
   }
 
+    if (tx.updateMarginMode && tx.updateMarginMode.length > 0) {
+    if (addDivider) {
+      elms.push(divider());
+    }
+    elms.push(text(`**Margin Mode Updates:**`));
+    for (const [i, c] of tx.updateMarginMode.entries()) {
+      elms.push(text(`__${i + 1}:__`));
+      elms.push(...prettyPrintTx({ updateMarginMode: c }, indentText));
+    }
+  }
+
   return elms;
 }
 
