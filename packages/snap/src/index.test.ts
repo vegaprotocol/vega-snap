@@ -94,39 +94,48 @@ describe('onRpcRequest', () => {
         },
         {
           name: 'Snap Key 2',
-          publicKey: 'f004fb2bef25909033225254689cf18064b8130db2b00c6ae7f59e3a3b237a96',
+          publicKey:
+            'f004fb2bef25909033225254689cf18064b8130db2b00c6ae7f59e3a3b237a96',
         },
         {
           name: 'Snap Key 3',
-          publicKey: '7adb4cfdc76ea148975ea2acc380b3a7794aec1a4ab2f3034e1041db882b5b08',
+          publicKey:
+            '7adb4cfdc76ea148975ea2acc380b3a7794aec1a4ab2f3034e1041db882b5b08',
         },
         {
           name: 'Snap Key 4',
-          publicKey: 'e966107938c1c5fcb08147949d43bcb05057a8bc50742ca4f9742d102c5c085a',
+          publicKey:
+            'e966107938c1c5fcb08147949d43bcb05057a8bc50742ca4f9742d102c5c085a',
         },
         {
           name: 'Snap Key 5',
-          publicKey: 'a4ffcea0c25354306947a4c80fbf6464d07b4b0d17e001916b2bcbcb6da4259e',
+          publicKey:
+            'a4ffcea0c25354306947a4c80fbf6464d07b4b0d17e001916b2bcbcb6da4259e',
         },
         {
           name: 'Snap Key 6',
-          publicKey: 'afc6e36ff6b4c188f516d6a2ce3d76c72e90a4b35440808087f3db7b294c1a85',
+          publicKey:
+            'afc6e36ff6b4c188f516d6a2ce3d76c72e90a4b35440808087f3db7b294c1a85',
         },
         {
           name: 'Snap Key 7',
-          publicKey: '8e5263b318e2767de7b93a26a9e3ab168315d5503acd936bdeb6a17183c8393d',
+          publicKey:
+            '8e5263b318e2767de7b93a26a9e3ab168315d5503acd936bdeb6a17183c8393d',
         },
         {
           name: 'Snap Key 8',
-          publicKey: '39d1ab506cda7a0d989dd0651f3d9fe7e2f2309814a5a449c4e021c8e8716e78',
+          publicKey:
+            '39d1ab506cda7a0d989dd0651f3d9fe7e2f2309814a5a449c4e021c8e8716e78',
         },
         {
           name: 'Snap Key 9',
-          publicKey: '608a6a000f10ba588cbadfc1a274c6e3601f97d80288055ba36e6e954bf1ff60',
+          publicKey:
+            '608a6a000f10ba588cbadfc1a274c6e3601f97d80288055ba36e6e954bf1ff60',
         },
         {
           name: 'Snap Key 10',
-          publicKey: 'eb3b36123a6714013e9418a7ad78991a6a7f58d15f7ee1956c0dbb46a79719af',
+          publicKey:
+            'eb3b36123a6714013e9418a7ad78991a6a7f58d15f7ee1956c0dbb46a79719af',
         },
       ],
     });
