@@ -1,4 +1,4 @@
-import { panel, heading, text, divider, copyable } from '@metamask/snaps-ui';
+import { panel, heading, text, divider, copyable } from '@metamask/snaps-sdk';
 import { invalidParameters } from './errors';
 
 /**
