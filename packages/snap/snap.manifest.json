@@ -7,7 +7,7 @@
     "url": "https://github.com/vegaprotocol/vega-snap.git"
   },
   "source": {
-    "shasum": "tl0PnzvAgNpcm55tuuyNd2qSxZ+E0U2fI97lZQJ9GnY=",
+    "shasum": "qsKibCERo8hp4mAX4igmhUn7LT3bU/JUQFPh5t9dM7Q=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -27,7 +27,11 @@
     },
     "snap_getBip32Entropy": [
       {
-        "path": ["m", "1789'", "0'"],
+        "path": [
+          "m",
+          "1789'",
+          "0'"
+        ],
         "curve": "ed25519"
       }
     ]
