@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Vega Metamask Snap that adds Vega support for Metamask",
   "proposedName": "Vega Protocol",
   "repository": {
@@ -7,7 +7,7 @@
     "url": "https://github.com/vegaprotocol/vega-snap.git"
   },
   "source": {
-    "shasum": "zTTCLeOMw0TlnTdjMHc15hpcUBcnSGC4dUcrFktb92I=",
+    "shasum": "CmTs/E+H30LSIIFLcbHosdISjn8Gow/sSPi4PrBQWKE=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
