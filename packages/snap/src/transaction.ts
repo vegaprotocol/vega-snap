@@ -11,12 +11,12 @@ import { deriveKeyPair } from './keys';
  * @param publicKey - The public key of the key pair.
  * @returns The key pair.
  */
-async function findKeyPair(publicKey: string) {
+export async function findKeyPair(publicKey: string) {
   // always generate the 11 first keys
   for (let i = 0; i < 11; i++) {
     const keyPair = await deriveKeyPair(i);
     if (keyPair.publicKey.toString() === publicKey) {
-      return keyPair;
+      return { index: i, keyPair };
     }
   }
 
@@ -41,13 +41,13 @@ export async function send(node, transaction, sendingMode, publicKey) {
     encodeInputData(transaction, latestBlock),
   ]);
 
-  const keyPair = await findKeyPair(publicKey);
+  const pair = await findKeyPair(publicKey);
 
-  if (keyPair === null) {
-    throw invalidParameters('Uknown public key');
+  if (pair === null) {
+    throw invalidParameters('Unknown public key');
   }
 
-  const tx = await encodeTransaction(inputData, keyPair, pow, chainId);
+  const tx = await encodeTransaction(inputData, pair.keyPair, pow, chainId);
 
   const sentAt = new Date().toISOString();
   const res = await node.submitRawTransaction(toBase64(tx.raw), sendingMode);

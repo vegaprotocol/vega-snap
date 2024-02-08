@@ -83,6 +83,12 @@ async function sendTransaction(origin: string, request: JsonRpcRequest) {
     throw invalidParameters('Invalid public key');
   }
 
+  const pair = await txs.findKeyPair(publicKey);
+
+  if (pair === null) {
+    throw invalidParameters('Unknown public key');
+  }
+
   const node = await rpc.findHealthyNode(
     networkEndpoints.map((u) => new URL(u)),
   );
@@ -100,7 +106,7 @@ async function sendTransaction(origin: string, request: JsonRpcRequest) {
     origin,
     sanitizedTransaction,
     node.getURL(),
-    publicKey,
+    pair,
   );
 
   if (approved !== true) {
