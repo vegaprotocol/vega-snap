@@ -8,18 +8,22 @@ import { invalidParameters } from './errors';
  * @param origin - Origin of the transaction.
  * @param transaction - Transaction to display.
  * @param selectedNetworkEntrypoint - The selected network entrypoint as a URL. The origin is displayed to the user.
+ * @param publicKey - The selected public key.
  * @returns `true` if the user approves the transaction, `false` otherwise.
  */
 export async function reviewTransaction(
   origin: string,
   transaction: any,
   selectedNetworkEntrypoint: URL,
+  publicKey: string,
 ) {
   const content = panel([
     heading(transactionTitle(transaction)),
     text(`Request from: **${origin}**`),
     divider(),
     ...prettyPrintTx(transaction, text),
+    divider(),
+    text(`Selected key: ${publicKey}`),
     divider(),
     text(`Selected network entrypoint: ${selectedNetworkEntrypoint.origin}`),
     divider(),

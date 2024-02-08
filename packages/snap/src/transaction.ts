@@ -6,6 +6,24 @@ import { invalidParameters } from './errors';
 import { deriveKeyPair } from './keys';
 
 /**
+ * Find the key pair corresponding to the public key.
+ *
+ * @param publicKey - The public key of the key pair.
+ * @returns The key pair.
+ */
+async function findKeyPair(publicKey: string) {
+  // always generate the 11 first keys
+  for (let i = 0; i < 11; i++) {
+    const keyPair = await deriveKeyPair(i);
+    if (keyPair.publicKey.toString() === publicKey) {
+      return keyPair;
+    }
+  }
+
+  return null;
+}
+
+/**
  * Encode and send a transaction to the Vega network.
  *
  * @param node - A `NodeRPC` instance.
@@ -23,9 +41,9 @@ export async function send(node, transaction, sendingMode, publicKey) {
     encodeInputData(transaction, latestBlock),
   ]);
 
-  const keyPair = await deriveKeyPair(0);
+  const keyPair = await findKeyPair(publicKey);
 
-  if (keyPair.publicKey.toString() !== publicKey) {
+  if (keyPair === null) {
     throw invalidParameters('Uknown public key');
   }
 

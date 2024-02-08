@@ -100,6 +100,7 @@ async function sendTransaction(origin: string, request: JsonRpcRequest) {
     origin,
     sanitizedTransaction,
     node.getURL(),
+    publicKey,
   );
 
   if (approved !== true) {
