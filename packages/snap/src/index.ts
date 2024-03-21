@@ -2,7 +2,7 @@ import { OnRpcRequestHandler, JsonRpcRequest } from '@metamask/snaps-sdk';
 import rpc from './node-rpc';
 import * as txs from './transaction';
 import { deriveKeyPair } from './keys';
-import { reviewTransaction, transactionTitle } from './ui';
+import { reviewTransaction } from './ui';
 import {
   invalidParameters,
   JSONRPCError,
@@ -11,6 +11,7 @@ import {
   transactionDenied,
   transactionFailed,
 } from './errors';
+import { transactionTitle } from './transaction-ui/transaction-title';
 
 /**
  * List the keys in the wallet.
