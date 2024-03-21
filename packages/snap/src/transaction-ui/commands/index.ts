@@ -1,8 +1,6 @@
-import { panel, heading, text, divider, copyable } from '@metamask/snaps-sdk';
-import { invalidParameters } from './errors';
+import { text, divider, copyable } from '@metamask/snaps-sdk';
 import {
   formatTimestamp,
-  getAccountType,
   getExpiryStrategy,
   getMarginMode,
   getPeggedReference,
@@ -11,115 +9,8 @@ import {
   indentText,
   isUnspecified,
   minimiseId,
-} from './transaction-ui/utils';
-import { transactionTitle } from './transaction-ui/transaction-title';
-
-/**
- * Displays a confirmation dialog with the given transaction, pretty printing
- * the transaction and providing a copyable raw transaction.
- *
- * @param origin - Origin of the transaction.
- * @param transaction - Transaction to display.
- * @param selectedNetworkEntrypoint - The selected network entrypoint as a URL. The origin is displayed to the user.
- * @param pair - The selected public key.
- * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
- * @returns `true` if the user approves the transaction, `false` otherwise.
- */
-export async function reviewTransaction(
-  origin: string,
-  transaction: any,
-  selectedNetworkEntrypoint: URL,
-  pair: any,
-  enrichmentData: any,
-) {
-  const publicKey = pair.keyPair.publicKey.toString();
-  const content = panel([
-    heading(transactionTitle(transaction)),
-    text(`Request from: **${origin}**`),
-    text(JSON.stringify(enrichmentData, null, 2)),
-    divider(),
-    ...prettyPrintTx(transaction, text, enrichmentData),
-    divider(),
-    text(`Selected key: Snap Key ${pair.index} (${minimiseId(publicKey)})`),
-    divider(),
-    text(`Selected network entrypoint: ${selectedNetworkEntrypoint.origin}`),
-    divider(),
-    text('Raw transaction:'),
-    copyable(
-      JSON.stringify(transaction, (_, v) =>
-        typeof v === 'bigint' ? v.toString() : v,
-      ),
-    ),
-  ]);
-
-  return snap.request({
-    method: 'snap_dialog',
-    params: {
-      type: 'confirmation',
-      content,
-    },
-  });
-}
-
-/**
- * Pretty prints a transaction depending of its type.
- *
- * @param tx - The transaction to be pretty printed.
- * @param textFn - The text function to be use for rendering.
- * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
- * @returns List of snap-ui elements.
- */
-function prettyPrintTx(tx: any, textFn: any, enrichmentData: any) {
-  const keys = Object.keys(tx);
-
-  if (keys.length !== 1) {
-    throw invalidParameters('Invalid transaction');
-  }
-
-  const txContent = tx[keys[0]];
-
-  switch (keys[0]) {
-    case 'batchMarketInstructions':
-      return prettyPrintBatchMarketInstructions(txContent, enrichmentData);
-    case 'orderSubmission':
-      return prettyPrintOrderSubmission(txContent, textFn, enrichmentData);
-    case 'orderCancellation':
-      return prettyPrintCancelOrder(txContent, textFn, enrichmentData);
-    case 'orderAmendment':
-      return prettyPrintOrderAmendment(txContent, textFn, enrichmentData);
-    case 'stopOrdersSubmission':
-      return prettyPrintStopOrdersSubmission(txContent, textFn, enrichmentData);
-    case 'stopOrdersCancellation':
-      return prettyPrintStopOrdersCancellation(
-        txContent,
-        textFn,
-        enrichmentData,
-      );
-
-    case 'withdrawSubmission':
-      return prettyPrintWithdrawSubmission(txContent, textFn, enrichmentData);
-    case 'transfer':
-      return prettyPrintTransferFunds(txContent, textFn, enrichmentData);
-
-    // TODO: do we care about this one?
-    case 'updateMarginMode':
-      return prettyPrintUpdateMarginMode(txContent, textFn);
-
-    case 'createReferralSet':
-      return prettyPrintCreateReferralSet(txContent, textFn);
-    case 'updateReferralSet':
-      return prettyPrintUpdateReferralSet(txContent, textFn);
-    case 'applyReferralCode':
-      return prettyPrintApplyReferralCode(txContent, textFn);
-    case 'joinTeam':
-      return prettyPrintJoinTeam(txContent, textFn);
-    case 'updatePartyProfile':
-      return prettyPrintUpdatePartyProfile(txContent, textFn);
-    default:
-      return prettyPrint(txContent);
-  }
-}
-
+} from '../utils';
+import { prettyPrintTx } from '../pretty-print-tx';
 /**
  * Pretty prints an update margin mode transaction.
  *
@@ -127,7 +18,7 @@ function prettyPrintTx(tx: any, textFn: any, enrichmentData: any) {
  * @param textFn - The text function used for rendering.
  * @returns List of snap-ui elements.
  */
-function prettyPrintUpdateMarginMode(tx: any, textFn: any) {
+export function prettyPrintUpdateMarginMode(tx: any, textFn: any) {
   const mode = getMarginMode(tx.mode);
   let marketId = minimiseId(tx.marketId);
   if (marketId === '') {
@@ -152,7 +43,7 @@ function prettyPrintUpdateMarginMode(tx: any, textFn: any) {
  * @param textFn - The text function used for rendering.
  * @returns List of snap-ui elements.
  */
-function prettyPrintUpdatePartyProfile(tx: any, textFn: any) {
+export function prettyPrintUpdatePartyProfile(tx: any, textFn: any) {
   const elms = [];
   if (tx.alias !== null) {
     elms.push(textFn(`**Alias**: ${tx.alias}`));
@@ -177,7 +68,7 @@ function prettyPrintUpdatePartyProfile(tx: any, textFn: any) {
  * @param textFn - The text function used for rendering.
  * @returns List of snap-ui elements.
  */
-function prettyPrintCreateReferralSet(tx: any, textFn: any) {
+export function prettyPrintCreateReferralSet(tx: any, textFn: any) {
   if (tx.isTeam === false) {
     return [textFn(`Create a new referral set`)];
   }
@@ -218,7 +109,7 @@ function prettyPrintCreateReferralSet(tx: any, textFn: any) {
  * @param textFn - The text function used for rendering.
  * @returns List of snap-ui elements.
  */
-function prettyPrintUpdateReferralSet(tx: any, textFn: any) {
+export function prettyPrintUpdateReferralSet(tx: any, textFn: any) {
   const id = minimiseId(tx.id);
 
   if (tx.isTeam === false) {
@@ -265,7 +156,7 @@ function prettyPrintUpdateReferralSet(tx: any, textFn: any) {
  * @param textFn - The text function used for rendering.
  * @returns List of snap-ui elements.
  */
-function prettyPrintApplyReferralCode(tx: any, textFn: any) {
+export function prettyPrintApplyReferralCode(tx: any, textFn: any) {
   const elms = [textFn(`Submit referral code: ${minimiseId(tx.id)}`)];
 
   return elms;
@@ -278,7 +169,7 @@ function prettyPrintApplyReferralCode(tx: any, textFn: any) {
  * @param textFn - The text function used for rendering.
  * @returns List of snap-ui elements.
  */
-function prettyPrintJoinTeam(tx: any, textFn: any) {
+export function prettyPrintJoinTeam(tx: any, textFn: any) {
   const elms = [textFn(`Join team: ${minimiseId(tx.id)}`)];
 
   return elms;
@@ -292,7 +183,11 @@ function prettyPrintJoinTeam(tx: any, textFn: any) {
  * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
  * @returns List of snap-ui elements.
  */
-function prettyPrintTransferFunds(tx: any, textFn: any, enrichmentData: any) {
+export function prettyPrintTransferFunds(
+  tx: any,
+  textFn: any,
+  enrichmentData: any,
+) {
   // handle only oneOff transfer, all others should be
   // the default prettyPrint
   if (!tx.oneOff && !tx.kind?.oneOff) {
@@ -358,7 +253,7 @@ function prettyPrintTransferFunds(tx: any, textFn: any, enrichmentData: any) {
  * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
  * @returns List of snap-ui elements.
  */
-function prettyPrintWithdrawSubmission(
+export function prettyPrintWithdrawSubmission(
   tx: any,
   textFn: any,
   enrichmentData: any,
@@ -384,7 +279,7 @@ function prettyPrintWithdrawSubmission(
  * @param textFn - The text function used for rendering.
  * @returns List of snap-ui elements.
  */
-function prettyPrintStopOrderDetails(so: any, textFn: any) {
+export function prettyPrintStopOrderDetails(so: any, textFn: any) {
   const elms = [];
   if (so.trigger?.price !== null && so.trigger?.price !== undefined) {
     elms.push(textFn(`Trigger price: ${so.trigger.price}`));
@@ -431,7 +326,7 @@ function prettyPrintStopOrderDetails(so: any, textFn: any) {
  * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
  * @returns List of snap-ui elements.
  */
-function prettyPrintStopOrdersSubmission(
+export function prettyPrintStopOrdersSubmission(
   tx: any,
   textFn: any,
   enrichmentData: any,
@@ -482,7 +377,11 @@ function prettyPrintStopOrdersSubmission(
  * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
  * @returns List of snap-ui elements.
  */
-function prettyPrintOrderSubmission(tx: any, textFn: any, enrichmentData: any) {
+export function prettyPrintOrderSubmission(
+  tx: any,
+  textFn: any,
+  enrichmentData: any,
+) {
   const elms = [];
   const isLimit = tx.type === 'TYPE_LIMIT';
   const side = getSide(tx.side);
@@ -548,7 +447,11 @@ function prettyPrintOrderSubmission(tx: any, textFn: any, enrichmentData: any) {
  * @param enrichedData
  * @returns List of snap-ui elements.
  */
-function prettyPrintOrderAmendment(tx: any, textFn: any, enrichedData: any) {
+export function prettyPrintOrderAmendment(
+  tx: any,
+  textFn: any,
+  enrichedData: any,
+) {
   const elms = [
     textFn(`**Order ID**: ${minimiseId(tx.orderId)}`),
     textFn(`**Market ID**: ${minimiseId(tx.marketId)}`),
@@ -626,7 +529,10 @@ function prettyPrintOrderAmendment(tx: any, textFn: any, enrichedData: any) {
  * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
  * @returns List of snap-ui elements.
  */
-function prettyPrintBatchMarketInstructions(tx: any, enrichmentData: any) {
+export function prettyPrintBatchMarketInstructions(
+  tx: any,
+  enrichmentData: any,
+) {
   const elms = [];
   let addDivider = false;
 
@@ -726,7 +632,11 @@ function prettyPrintBatchMarketInstructions(tx: any, enrichmentData: any) {
  * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
  * @returns List of snap-ui elements.
  */
-function prettyPrintCancelOrder(tx: any, textFn: any, enrichmentData: any) {
+export function prettyPrintCancelOrder(
+  tx: any,
+  textFn: any,
+  enrichmentData: any,
+) {
   const hasOrderId =
     tx.orderId !== undefined && tx.orderId !== null && tx.orderId !== '';
   const hasMarketId =
@@ -757,7 +667,7 @@ function prettyPrintCancelOrder(tx: any, textFn: any, enrichmentData: any) {
  * @param enrichedData
  * @returns List of snap-ui elements.
  */
-function prettyPrintStopOrdersCancellation(
+export function prettyPrintStopOrdersCancellation(
   tx: any,
   textFn: any,
   enrichedData: any,
@@ -792,7 +702,7 @@ function prettyPrintStopOrdersCancellation(
  * @param obj - Object to pretty print. Primitives will be coerced to strings, while objects will be recursed into.
  * @returns List of snap-ui elements.
  */
-function prettyPrint(obj: any) {
+export function prettyPrint(obj: any) {
   const elms = [];
 
   if (obj === null || obj === undefined) {
