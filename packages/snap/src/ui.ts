@@ -1,5 +1,18 @@
 import { panel, heading, text, divider, copyable } from '@metamask/snaps-sdk';
 import { invalidParameters } from './errors';
+import {
+  formatTimestamp,
+  getAccountType,
+  getExpiryStrategy,
+  getMarginMode,
+  getPeggedReference,
+  getSide,
+  getTimeInForce,
+  indentText,
+  isUnspecified,
+  minimiseId,
+} from './transaction-ui/utils';
+import { transactionTitle } from './transaction-ui/transaction-title';
 
 /**
  * Displays a confirmation dialog with the given transaction, pretty printing
@@ -46,84 +59,6 @@ export async function reviewTransaction(
       content,
     },
   });
-}
-
-/**
- * Displays a debug dialog with the given object.
- *
- * @param obj - Any JSON serializable object to display.
- * @returns `true` if the user approves the transaction, `false` otherwise.
- */
-export async function debug(obj: any) {
-  const content = panel([
-    heading('Debug'),
-    divider(),
-    ...prettyPrint(obj),
-    divider(),
-    text('Raw data:'),
-    copyable(
-      JSON.stringify(obj, (_, v) => (typeof v === 'bigint' ? v.toString() : v)),
-    ),
-  ]);
-
-  return snap.request({
-    method: 'snap_dialog',
-    params: {
-      type: 'confirmation',
-      content,
-    },
-  });
-}
-
-/**
- * Indents a string to be send to a text snap-ui component.
- *
- * @param t - A string to be displayed.
- * @returns A text snap-ui component prepended with indentation.
- */
-function indentText(t: string) {
-  const indent = '&nbsp;&nbsp;&nbsp;&nbsp;';
-  return text(`${indent}${t}`);
-}
-
-/**
- * Optimise the length of a Vega ID to be displayed.
- *
- * @param id - An ID to be minimised.
- * @returns A minimised Vega ID.
- */
-function minimiseId(id: string) {
-  if (id.length > 12) {
-    return `${id.slice(0, 6)}…${id.slice(-6)}`;
-  }
-  return id;
-}
-
-/**
- * Formats a unix timestamps to human readable output.
- *
- * @param t - A unix timestamps as an integer.
- * @returns A unix timestamps formatted into a human readable date.
- */
-function formatTimestamp(t: number) {
-  return new Date(t * 1000).toLocaleString();
-}
-
-/**
- * Gets a human readable version of an account type.
- *
- * @param type - The account type.
- * @returns A human readable version of the account type.
- */
-function getAccountType(type: string) {
-  switch (type) {
-    case 'ACCOUNT_TYPE_GLOBAL_REWARD':
-      return 'Global Reward';
-    case 'ACCOUNT_TYPE_GENERAL':
-      return 'General';
-    default:
-      throw invalidParameters('Invalid account type');
-  }
 }
 
 /**
@@ -685,121 +620,6 @@ function prettyPrintOrderAmendment(tx: any, textFn: any, enrichedData: any) {
 }
 
 /**
- * Check if a vega proto enum is the unspecified field.
- *
- * @param v - The field to check.
- * @returns True if this v is an unspecified field.
- */
-function isUnspecified(v: string) {
-  return v.endsWith('_UNSPECIFIED');
-}
-
-/**
- * Gets a human readable string representing a pegged order reference.
- *
- * @param ref - A pegged order reference.
- * @returns The human readable string.
- */
-function getPeggedReference(ref: string) {
-  switch (ref) {
-    case 'PEGGED_REFERENCE_UNSPECIFIED':
-      return 'Unspecified';
-    case 'PEGGED_REFERENCE_MID':
-      return 'Mid';
-    case 'PEGGED_REFERENCE_BEST_BID':
-      return 'Bid';
-    case 'PEGGED_REFERENCE_BEST_ASK':
-      return 'Ask';
-    default:
-      throw invalidParameters('Unknown Pegged Reference');
-  }
-}
-
-/**
- * Gets a human readable string representing a time in force.
- *
- * @param tif - The time in force.
- * @returns The human readable string.
- */
-function getTimeInForce(tif: string) {
-  switch (tif) {
-    case 'TIME_IN_FORCE_UNSPECIFIED':
-      return 'Unspecified';
-    case 'TIME_IN_FORCE_GTC':
-      return 'GTC';
-    case 'TIME_IN_FORCE_GTT':
-      return 'GTT';
-    case 'TIME_IN_FORCE_IOC':
-      return 'IOC';
-    case 'TIME_IN_FORCE_FOK':
-      return 'FOK';
-    case 'TIME_IN_FORCE_GFA':
-      return 'GFA';
-    case 'TIME_IN_FORCE_GFN':
-      return 'GFN';
-    default:
-      throw invalidParameters('Unknown Time in Force');
-  }
-}
-
-/**
- * Gets a human readable string representing of an expiry strategy.
- *
- * @param st - The expiry strategy.
- * @returns The human readable string.
- */
-function getExpiryStrategy(st: string) {
-  switch (st) {
-    case 'EXPIRY_UNSPECIFIED':
-      return 'Unspecified';
-    case 'EXPIRY_STRATEGY_CANCELS':
-      return 'Cancels';
-    case 'EXPIRY_STRATEGY_SUBMIT':
-      return 'Submit';
-    default:
-      throw invalidParameters('Unknown Expiry Strategy');
-  }
-}
-
-/**
- * Gets a human readable string representing a side.
- *
- * @param side - The side.
- * @returns The human readable string.
- */
-function getSide(side: string) {
-  switch (side) {
-    case 'SIDE_UNSPECIFIED':
-      return 'Unspecified';
-    case 'SIDE_BUY':
-      return 'Buy';
-    case 'SIDE_SELL':
-      return 'Sell';
-    default:
-      throw invalidParameters('Unknown Side');
-  }
-}
-
-/**
- * Gets a human readable string representing a margin mode.
- *
- * @param mode - The margin mode.
- * @returns The human readable string.
- */
-function getMarginMode(mode: string) {
-  switch (mode) {
-    case 'MODE_UNSPECIFIED':
-      return 'Unspecified';
-    case 'MODE_CROSS_MARGIN':
-      return 'Cross margin';
-    case 'MODE_ISOLATED_MARGIN':
-      return 'Isolated margin';
-    default:
-      throw invalidParameters('Unknown Margin Mode');
-  }
-}
-
-/**
  * Pretty print a batch market instructions transaction.
  *
  * @param tx - The transaction.
@@ -991,92 +811,4 @@ function prettyPrint(obj: any) {
   }
 
   return elms;
-}
-
-/**
- * Formats a human readable transaction title based on the transaction command.
- *
- * @param tx - Object with a single command property. Uusally the incoming `transaction` property from `client.send_transaction`.
- * @returns A human readable transaction title.
- */
-export function transactionTitle(tx: any): string {
-  const keys = Object.keys(tx);
-
-  if (keys.length !== 1) {
-    throw invalidParameters('Invalid transaction');
-  }
-
-  switch (keys[0]) {
-    case 'orderSubmission':
-      return 'Order submission';
-    case 'orderCancellation':
-      return 'Order cancellation';
-    case 'orderAmendment':
-      return 'Order amendment';
-    case 'withdrawSubmission':
-      return 'Withdraw submission';
-    case 'proposalSubmission':
-      return 'Proposal submission';
-    case 'voteSubmission':
-      return 'Vote submission';
-    case 'liquidityProvisionSubmission':
-      return 'Liquidity provision';
-    case 'delegateSubmission':
-      return 'Delegate submission';
-    case 'undelegateSubmission':
-      return 'Undelegate submission';
-    case 'liquidityProvisionCancellation':
-      return 'Liquidity provision cancellation';
-    case 'liquidityProvisionAmendment':
-      return 'Liquidity provision amendment';
-    case 'transfer':
-      return 'Transfer';
-    case 'cancelTransfer':
-      return 'Cancel transfer';
-    case 'announceNode':
-      return 'Announce node';
-    case 'batchMarketInstructions':
-      return 'Batch market instructions';
-    case 'stopOrdersSubmission':
-      return 'Stop orders submission';
-    case 'stopOrdersCancellation':
-      return 'Stop orders cancellation';
-    case 'nodeVote':
-      return 'Node vote';
-    case 'nodeSignature':
-      return 'Node signature';
-    case 'chainEvent':
-      return 'Chain event';
-    case 'keyRotateSubmission':
-      return 'Key rotation submission';
-    case 'stateVariableProposal':
-      return 'State variable proposal';
-    case 'validatorHeartbeat':
-      return 'Validator heartbeat';
-    case 'ethereumKeyRotateSubmission':
-      return 'Ethereum key rotation submission';
-    case 'protocolUpgradeProposal':
-      return 'Protocol upgrade proposal';
-    case 'issueSignatures':
-      return 'Issue signatures';
-    case 'oracleDataSubmission':
-      return 'Oracle data submission';
-    case 'createReferralSet':
-      return 'Create referral set';
-    case 'updateReferralSet':
-      return 'Update referral set';
-    case 'applyReferralCode':
-      return 'Apply referral code';
-    case 'batchProposalSubmission':
-      return 'Batch proposal submission';
-    case 'updatePartyProfile':
-      return 'Update party profile';
-    case 'updateMarginMode':
-      return 'Update margin mode';
-    case 'joinTeam':
-      return 'Join team';
-    default:
-      // TODO: Should this throw? If the protos are out of date this will prevent new transactions being sent. Should this be a warning?
-      throw invalidParameters('Unknown transaction type');
-  }
 }
