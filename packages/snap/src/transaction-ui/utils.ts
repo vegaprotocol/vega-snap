@@ -2,6 +2,63 @@ import { text } from '@metamask/snaps-sdk';
 import { invalidParameters } from '../errors';
 
 /**
+ * Formats a number based on the locale of the user.
+ *
+ * @param locale - The locale of the user.
+ * @returns A function that takes a number and returns a string formatted based on the locale.
+ */
+export function getFormatNumber(locale: string) {
+  return (n: number) => n.toLocaleString(locale);
+}
+
+/**
+ * Adds decimals to string numbers.
+ *
+ * @param number - The number to add decimal places to.
+ * @param decimals - The number of decimal places to add.
+ * @returns The number with the decimal places added.
+ */
+export function addDecimal(number: string, decimals: number) {
+  if (decimals === 0) {
+    return Number(number);
+  }
+  const numberWithDecimals = `${number.slice(0, -decimals)}.${number.slice(
+    -decimals,
+  )}`;
+  return Number(numberWithDecimals);
+}
+
+/**
+ * Given the enrichment data we are using to enrich the transaction data, this function
+ * finds the asset with the given id.
+ *
+ * @param enrichmentData - The data used to enrich the transaction data.
+ * @param id - The id of the asset to be found.
+ * @returns The asset with the given id, or undefined if it does not exist.
+ */
+export function getAssetById(enrichmentData: any, id: string) {
+  const node = enrichmentData?.assets?.edges?.find(
+    (edge: any) => edge?.node?.id === id,
+  );
+  return node?.node;
+}
+
+/**
+ * Given the enrichment data we are using to enrich the transaction data, this function
+ * finds the market with the given id.
+ *
+ * @param enrichmentData - The data used to enrich the transaction data.
+ * @param id - The id of the market to be found.
+ * @returns The market with the given id, or undefined if it does not exist.
+ */
+export function getMarketById(enrichmentData: any, id: string) {
+  const node = enrichmentData?.markets?.edges?.find(
+    (edge: any) => edge?.node?.id === id,
+  );
+  return node?.node;
+}
+
+/**
  * Indents a string to be send to a text snap-ui component.
  *
  * @param t - A string to be displayed.
