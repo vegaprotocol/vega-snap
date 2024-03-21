@@ -29,8 +29,9 @@ export function prettyPrintUpdateMarginMode(tx: any, textFn: any) {
   ];
 
   if (mode === 'Isolated margin') {
+    const leverage = 1 / Number(tx.marginFactor);
     elms.push(textFn(`**Margin factor**: ${tx.marginFactor}`));
-    elms.push(textFn(`**Margin factor**: ${tx.marginFactor}`));
+    elms.push(textFn(`**Leverage factor**: ${leverage.toFixed(2)}`));
   }
 
   return elms;
