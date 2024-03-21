@@ -9,7 +9,7 @@ import { invalidParameters } from './errors';
  * @param transaction - Transaction to display.
  * @param selectedNetworkEntrypoint - The selected network entrypoint as a URL. The origin is displayed to the user.
  * @param pair - The selected public key.
- * @param enrichmentData - Data used to enrich the transaction data to make it more human readable
+ * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
  * @returns `true` if the user approves the transaction, `false` otherwise.
  */
 export async function reviewTransaction(
@@ -25,7 +25,7 @@ export async function reviewTransaction(
     text(`Request from: **${origin}**`),
     text(JSON.stringify(enrichmentData, null, 2)),
     divider(),
-    ...prettyPrintTx(transaction, text),
+    ...prettyPrintTx(transaction, text, enrichmentData),
     divider(),
     text(`Selected key: Snap Key ${pair.index} (${minimiseId(publicKey)})`),
     divider(),
@@ -131,9 +131,10 @@ function getAccountType(type: string) {
  *
  * @param tx - The transaction to be pretty printed.
  * @param textFn - The text function to be use for rendering.
+ * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
  * @returns List of snap-ui elements.
  */
-function prettyPrintTx(tx: any, textFn: any) {
+function prettyPrintTx(tx: any, textFn: any, enrichmentData: any) {
   const keys = Object.keys(tx);
 
   if (keys.length !== 1) {
@@ -144,17 +145,31 @@ function prettyPrintTx(tx: any, textFn: any) {
 
   switch (keys[0]) {
     case 'batchMarketInstructions':
-      return prettyPrintBatchMarketInstructions(txContent);
+      return prettyPrintBatchMarketInstructions(txContent, enrichmentData);
     case 'orderSubmission':
-      return prettyPrintOrderSubmission(txContent, textFn);
+      return prettyPrintOrderSubmission(txContent, textFn, enrichmentData);
     case 'orderCancellation':
-      return prettyPrintCancelOrder(txContent, textFn);
+      return prettyPrintCancelOrder(txContent, textFn, enrichmentData);
     case 'orderAmendment':
-      return prettyPrintOrderAmendment(txContent, textFn);
+      return prettyPrintOrderAmendment(txContent, textFn, enrichmentData);
+    case 'stopOrdersSubmission':
+      return prettyPrintStopOrdersSubmission(txContent, textFn, enrichmentData);
+    case 'stopOrdersCancellation':
+      return prettyPrintStopOrdersCancellation(
+        txContent,
+        textFn,
+        enrichmentData,
+      );
+
     case 'withdrawSubmission':
-      return prettyPrintWithdrawSubmission(txContent, textFn);
+      return prettyPrintWithdrawSubmission(txContent, textFn, enrichmentData);
     case 'transfer':
-      return prettyPrintTransferFunds(txContent, textFn);
+      return prettyPrintTransferFunds(txContent, textFn, enrichmentData);
+
+    // TODO: do we care about this one?
+    case 'updateMarginMode':
+      return prettyPrintUpdateMarginMode(txContent, textFn);
+
     case 'createReferralSet':
       return prettyPrintCreateReferralSet(txContent, textFn);
     case 'updateReferralSet':
@@ -163,12 +178,6 @@ function prettyPrintTx(tx: any, textFn: any) {
       return prettyPrintApplyReferralCode(txContent, textFn);
     case 'joinTeam':
       return prettyPrintJoinTeam(txContent, textFn);
-    case 'stopOrdersSubmission':
-      return prettyPrintStopOrdersSubmission(txContent, textFn);
-    case 'stopOrdersCancellation':
-      return prettyPrintStopOrdersCancellation(txContent, textFn);
-    case 'updateMarginMode':
-      return prettyPrintUpdateMarginMode(txContent, textFn);
     case 'updatePartyProfile':
       return prettyPrintUpdatePartyProfile(txContent, textFn);
     default:
@@ -194,6 +203,7 @@ function prettyPrintUpdateMarginMode(tx: any, textFn: any) {
   ];
 
   if (mode === 'Isolated margin') {
+    elms.push(textFn(`**Margin factor**: ${tx.marginFactor}`));
     elms.push(textFn(`**Margin factor**: ${tx.marginFactor}`));
   }
 
@@ -344,9 +354,10 @@ function prettyPrintJoinTeam(tx: any, textFn: any) {
  *
  * @param tx - The transfer funds transaction.
  * @param textFn - The text function to be used for rendering.
+ * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
  * @returns List of snap-ui elements.
  */
-function prettyPrintTransferFunds(tx: any, textFn: any) {
+function prettyPrintTransferFunds(tx: any, textFn: any, enrichmentData: any) {
   // handle only oneOff transfer, all others should be
   // the default prettyPrint
   if (!tx.oneOff && !tx.kind?.oneOff) {
@@ -409,9 +420,14 @@ function prettyPrintTransferFunds(tx: any, textFn: any) {
  *
  * @param tx - The withdrawal submission transaction.
  * @param textFn - The text function used for rendering.
+ * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
  * @returns List of snap-ui elements.
  */
-function prettyPrintWithdrawSubmission(tx: any, textFn: any) {
+function prettyPrintWithdrawSubmission(
+  tx: any,
+  textFn: any,
+  enrichmentData: any,
+) {
   const elms = [
     textFn(`**Amount**: ${tx.amount}`),
     textFn(`**Asset ID**:`),
@@ -477,9 +493,14 @@ function prettyPrintStopOrderDetails(so: any, textFn: any) {
  *
  * @param tx - The order submission transaction.
  * @param textFn - The text function used for rendering.
+ * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
  * @returns List of snap-ui elements.
  */
-function prettyPrintStopOrdersSubmission(tx: any, textFn: any) {
+function prettyPrintStopOrdersSubmission(
+  tx: any,
+  textFn: any,
+  enrichmentData: any,
+) {
   const elms = [];
   if (tx.risesAbove !== null && tx.risesAbove !== undefined) {
     elms.push(textFn('**Rises Above**'));
@@ -491,6 +512,7 @@ function prettyPrintStopOrdersSubmission(tx: any, textFn: any) {
       ...prettyPrintTx(
         { orderSubmission: tx.risesAbove.orderSubmission },
         indentText,
+        enrichmentData,
       ),
     );
   }
@@ -509,6 +531,7 @@ function prettyPrintStopOrdersSubmission(tx: any, textFn: any) {
       ...prettyPrintTx(
         { orderSubmission: tx.fallsBelow.orderSubmission },
         indentText,
+        enrichmentData,
       ),
     );
   }
@@ -521,9 +544,10 @@ function prettyPrintStopOrdersSubmission(tx: any, textFn: any) {
  *
  * @param tx - The order submission transaction.
  * @param textFn - The text function used for rendering.
+ * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
  * @returns List of snap-ui elements.
  */
-function prettyPrintOrderSubmission(tx: any, textFn: any) {
+function prettyPrintOrderSubmission(tx: any, textFn: any, enrichmentData: any) {
   const elms = [];
   const isLimit = tx.type === 'TYPE_LIMIT';
   const side = getSide(tx.side);
@@ -586,9 +610,10 @@ function prettyPrintOrderSubmission(tx: any, textFn: any) {
  *
  * @param tx - The order amendment transaction.
  * @param textFn - The test function used for rendering.
+ * @param enrichedData
  * @returns List of snap-ui elements.
  */
-function prettyPrintOrderAmendment(tx: any, textFn: any) {
+function prettyPrintOrderAmendment(tx: any, textFn: any, enrichedData: any) {
   const elms = [
     textFn(`**Order ID**: ${minimiseId(tx.orderId)}`),
     textFn(`**Market ID**: ${minimiseId(tx.marketId)}`),
@@ -778,9 +803,10 @@ function getMarginMode(mode: string) {
  * Pretty print a batch market instructions transaction.
  *
  * @param tx - The transaction.
+ * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
  * @returns List of snap-ui elements.
  */
-function prettyPrintBatchMarketInstructions(tx: any) {
+function prettyPrintBatchMarketInstructions(tx: any, enrichmentData: any) {
   const elms = [];
   let addDivider = false;
 
@@ -788,7 +814,9 @@ function prettyPrintBatchMarketInstructions(tx: any) {
     elms.push(text(`**Order Cancellations:**`));
     for (const [i, c] of tx.cancellations.entries()) {
       elms.push(text(`__${i + 1}:__`));
-      elms.push(...prettyPrintTx({ orderCancellation: c }, indentText));
+      elms.push(
+        ...prettyPrintTx({ orderCancellation: c }, indentText, enrichmentData),
+      );
     }
     addDivider = true;
   }
@@ -800,7 +828,9 @@ function prettyPrintBatchMarketInstructions(tx: any) {
     elms.push(text(`**Order Amendments:**`));
     for (const [i, c] of tx.amendments.entries()) {
       elms.push(text(`__${i + 1}:__`));
-      elms.push(...prettyPrintTx({ orderAmendment: c }, indentText));
+      elms.push(
+        ...prettyPrintTx({ orderAmendment: c }, indentText, enrichmentData),
+      );
     }
     addDivider = true;
   }
@@ -812,7 +842,9 @@ function prettyPrintBatchMarketInstructions(tx: any) {
     elms.push(text(`**Order Submissions:**`));
     for (const [i, c] of tx.submissions.entries()) {
       elms.push(text(`__${i + 1}:__`));
-      elms.push(...prettyPrintTx({ orderSubmission: c }, indentText));
+      elms.push(
+        ...prettyPrintTx({ orderSubmission: c }, indentText, enrichmentData),
+      );
     }
   }
 
@@ -823,7 +855,13 @@ function prettyPrintBatchMarketInstructions(tx: any) {
     elms.push(text(`**Stop Orders Cancellations:**`));
     for (const [i, c] of tx.stopOrdersCancellation.entries()) {
       elms.push(text(`__${i + 1}:__`));
-      elms.push(...prettyPrintTx({ stopOrdersCancellation: c }, indentText));
+      elms.push(
+        ...prettyPrintTx(
+          { stopOrdersCancellation: c },
+          indentText,
+          enrichmentData,
+        ),
+      );
     }
   }
 
@@ -834,7 +872,13 @@ function prettyPrintBatchMarketInstructions(tx: any) {
     elms.push(text(`**Stop Orders Submissions:**`));
     for (const [i, c] of tx.stopOrdersSubmission.entries()) {
       elms.push(text(`__${i + 1}:__`));
-      elms.push(...prettyPrintTx({ stopOrdersSubmission: c }, indentText));
+      elms.push(
+        ...prettyPrintTx(
+          { stopOrdersSubmission: c },
+          indentText,
+          enrichmentData,
+        ),
+      );
     }
   }
 
@@ -845,7 +889,9 @@ function prettyPrintBatchMarketInstructions(tx: any) {
     elms.push(text(`**Margin Mode Updates:**`));
     for (const [i, c] of tx.updateMarginMode.entries()) {
       elms.push(text(`__${i + 1}:__`));
-      elms.push(...prettyPrintTx({ updateMarginMode: c }, indentText));
+      elms.push(
+        ...prettyPrintTx({ updateMarginMode: c }, indentText, enrichmentData),
+      );
     }
   }
 
@@ -857,9 +903,10 @@ function prettyPrintBatchMarketInstructions(tx: any) {
  *
  * @param tx - The cancel order transaction.
  * @param textFn - The text function used for rendering.
+ * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
  * @returns List of snap-ui elements.
  */
-function prettyPrintCancelOrder(tx: any, textFn: any) {
+function prettyPrintCancelOrder(tx: any, textFn: any, enrichmentData: any) {
   const hasOrderId =
     tx.orderId !== undefined && tx.orderId !== null && tx.orderId !== '';
   const hasMarketId =
@@ -887,9 +934,14 @@ function prettyPrintCancelOrder(tx: any, textFn: any) {
  *
  * @param tx - The cancel stop order transaction.
  * @param textFn - The text function used for rendering.
+ * @param enrichedData
  * @returns List of snap-ui elements.
  */
-function prettyPrintStopOrdersCancellation(tx: any, textFn: any) {
+function prettyPrintStopOrdersCancellation(
+  tx: any,
+  textFn: any,
+  enrichedData: any,
+) {
   const hasOrderId =
     tx.orderId !== undefined &&
     tx.stopOrderId !== null &&
@@ -1024,6 +1076,7 @@ export function transactionTitle(tx: any): string {
     case 'joinTeam':
       return 'Join team';
     default:
+      // TODO: Should this throw? If the protos are out of date this will prevent new transactions being sent. Should this be a warning?
       throw invalidParameters('Unknown transaction type');
   }
 }
