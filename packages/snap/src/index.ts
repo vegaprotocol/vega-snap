@@ -99,7 +99,8 @@ async function sendTransaction(origin: string, request: JsonRpcRequest) {
   transactionTitle(transaction);
 
   const sanitizedTransaction = await txs.sanitizeCommand(transaction);
-
+  const assets = await node.getJSON('api/v2/assets');
+  const markets = await node.getJSON('api/v2/markets');
   // Transaction validation is somewhat handled down in this function.
   // Could be improved and made more explicit.
   const approved = await reviewTransaction(
@@ -107,6 +108,10 @@ async function sendTransaction(origin: string, request: JsonRpcRequest) {
     sanitizedTransaction,
     node.getURL(),
     pair,
+    {
+      assets,
+      markets,
+    },
   );
 
   if (approved !== true) {

@@ -9,6 +9,7 @@ import { invalidParameters } from './errors';
  * @param transaction - Transaction to display.
  * @param selectedNetworkEntrypoint - The selected network entrypoint as a URL. The origin is displayed to the user.
  * @param pair - The selected public key.
+ * @param enrichmentData - Data used to enrich the transaction data to make it more human readable
  * @returns `true` if the user approves the transaction, `false` otherwise.
  */
 export async function reviewTransaction(
@@ -16,11 +17,13 @@ export async function reviewTransaction(
   transaction: any,
   selectedNetworkEntrypoint: URL,
   pair: any,
+  enrichmentData: any,
 ) {
   const publicKey = pair.keyPair.publicKey.toString();
   const content = panel([
     heading(transactionTitle(transaction)),
     text(`Request from: **${origin}**`),
+    text(JSON.stringify(enrichmentData, null, 2)),
     divider(),
     ...prettyPrintTx(transaction, text),
     divider(),
