@@ -7,16 +7,16 @@ export default class NodeRPC {
    * @param {URL[]} nodeUrls
    */
   constructor(nodeUrl) {
-    assert(nodeUrl instanceof URL, 'nodeUrl must be WHATWG URLs')
+    assert(nodeUrl instanceof URL, 'nodeUrl must be WHATWG URLs');
 
-    this._url = nodeUrl
+    this._url = nodeUrl;
   }
 
   /**
    * @returns {URL}
    */
   getURL() {
-    return this._url
+    return this._url;
   }
 
   /**
@@ -28,20 +28,21 @@ export default class NodeRPC {
    * @throws {Error} if response status is not 2xx
    * @throws {Error} if response body is not JSON
    */
-  async getJSON(url) {
-    const _url = new URL(url, this._url)
+  async getJSON(url, options = {}) {
+    const _url = new URL(url, this._url);
 
     const res = await fetch(_url, {
+      ...options,
       headers: {
-        Accept: 'application/json'
-      }
-    })
+        Accept: 'application/json',
+      },
+    });
 
     if (!res.ok) {
-      throw new Error(`HTTP ${res.status} ${res.statusText}`)
+      throw new Error(`HTTP ${res.status} ${res.statusText}`);
     }
 
-    return res.json()
+    return res.json();
   }
 
   /**
@@ -54,22 +55,22 @@ export default class NodeRPC {
    * @throws {Error} if response body is not JSON
    */
   async postJSON(url, body) {
-    const _url = new URL(url, this._url)
+    const _url = new URL(url, this._url);
 
     const res = await fetch(_url, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(body)
-    })
+      body: JSON.stringify(body),
+    });
 
     if (!res.ok) {
-      throw new Error(`HTTP ${res.status} ${res.statusText}`)
+      throw new Error(`HTTP ${res.status} ${res.statusText}`);
     }
 
-    return res.json()
+    return res.json();
   }
 
   /**
@@ -85,46 +86,57 @@ export default class NodeRPC {
    *
    * @returns URL
    */
-  static async findHealthyNode(urls, maxDrift = 2, bucketSize = 3, maxDelay = 800) {
-    const timeout = new AbortController()
+  static async findHealthyNode(
+    urls,
+    maxDrift = 2,
+    bucketSize = 3,
+    maxDelay = 800,
+  ) {
+    const timeout = new AbortController();
 
     const nodesHeights = await promiseAllResolved(
       urls.map(async (u) => {
         const res = await fetch(new URL('/blockchain/height', u), {
           signal: timeout.signal,
           headers: {
-            Accept: 'application/json'
-          }
-        })
+            Accept: 'application/json',
+          },
+        });
 
-        if (res.ok === false) throw new Error('Failed request')
+        if (res.ok === false) throw new Error('Failed request');
 
-        const { height } = await res.json()
+        const { height } = await res.json();
 
-        const coreHeight = BigInt(height)
+        const coreHeight = BigInt(height);
         // The header is not set for talking to core nodes
-        const nodeHeight = BigInt(res.headers.get('x-block-height') ?? coreHeight)
+        const nodeHeight = BigInt(
+          res.headers.get('x-block-height') ?? coreHeight,
+        );
 
-        const drift = coreHeight - nodeHeight
+        const drift = coreHeight - nodeHeight;
         // eslint-disable-next-line yoda
-        if (-maxDrift > drift || drift > maxDrift) throw new Error('Block drift too high')
+        if (-maxDrift > drift || drift > maxDrift)
+          throw new Error('Block drift too high');
 
-        return [u, nodeHeight]
-      })
-    )
+        return [u, nodeHeight];
+      }),
+    );
 
-    const maxHeight = nodesHeights.reduce((m, [_, height]) => bigintMax(m, height), 0n)
+    const maxHeight = nodesHeights.reduce(
+      (m, [_, height]) => bigintMax(m, height),
+      0n,
+    );
 
     const groups = group(nodesHeights, ([node, height]) => {
-      const key = (maxHeight - height) / BigInt(bucketSize) // Group into buckets
-      return [key, node]
-    })
+      const key = (maxHeight - height) / BigInt(bucketSize); // Group into buckets
+      return [key, node];
+    });
 
-    const largestGroup = findLargest(groups)
+    const largestGroup = findLargest(groups);
 
-    if (largestGroup.length === 0) throw new Error('No healthy node found')
+    if (largestGroup.length === 0) throw new Error('No healthy node found');
 
-    return new this(pickRandom(largestGroup))
+    return new this(pickRandom(largestGroup));
 
     // Math.max does not work with bigint
     /**
@@ -134,52 +146,60 @@ export default class NodeRPC {
      * @returns bigint
      */
     function bigintMax(a, b) {
-      return a > b ? a : b
+      return a > b ? a : b;
     }
 
     async function promiseAllResolved(promises) {
       promises.forEach((p) => {
-        p.then(res => {
-          setTimeout(() => {
-            timeout.abort()
-          }, maxDelay)
-        }, () => { })
-      })
+        p.then(
+          (res) => {
+            setTimeout(() => {
+              timeout.abort();
+            }, maxDelay);
+          },
+          () => {},
+        );
+      });
 
       return Promise.allSettled(promises).then((results) => {
-        return results.filter(({ status }) => status === 'fulfilled').map(({ value }) => value)
-      })
+        return results
+          .filter(({ status }) => status === 'fulfilled')
+          .map(({ value }) => value);
+      });
     }
 
     function group(values, fn) {
       const groups = values.reduce((map, val) => {
-        const [key, value] = fn(val)
+        const [key, value] = fn(val);
 
-        const list = map.get(key) ?? []
-        list.push(value)
-        map.set(key, list)
+        const list = map.get(key) ?? [];
+        list.push(value);
+        map.set(key, list);
 
-        return map
-      }, new Map())
+        return map;
+      }, new Map());
 
-      return Array.from(groups.values())
+      return Array.from(groups.values());
     }
 
     function findLargest(arr) {
-      return arr.reduce((largest, group) => (group.length > largest.length ? group : largest), [])
+      return arr.reduce(
+        (largest, group) => (group.length > largest.length ? group : largest),
+        [],
+      );
     }
 
     function pickRandom(arr) {
-      return arr[(arr.length * Math.random()) | 0]
+      return arr[(arr.length * Math.random()) | 0];
     }
   }
 
   async blockchainHeight() {
-    return this.getJSON('/blockchain/height')
+    return this.getJSON('/blockchain/height');
   }
 
   async statistics() {
-    return this.getJSON('/statistics')
+    return this.getJSON('/statistics');
   }
 
   /**
@@ -188,89 +208,106 @@ export default class NodeRPC {
    * @returns
    */
   async statisticsSpam({ partyId }) {
-    assert(typeof partyId === 'string')
-    return this.getJSON(`/statistics/spam/${partyId}`)
+    assert(typeof partyId === 'string');
+    return this.getJSON(`/statistics/spam/${partyId}`);
   }
 
   async checkRawTransaction(tx) {
-    const res = await this.postJSON('/transaction/raw/check', { tx })
+    const res = await this.postJSON('/transaction/raw/check', { tx });
 
-    return res
+    return res;
   }
 
   async submitRawTransaction(tx, type) {
-    assert(typeof tx === 'string')
-    assert(typeof type === 'string')
+    assert(typeof tx === 'string');
+    assert(typeof type === 'string');
 
     const res = await this.postJSON('/transaction/raw', {
       tx,
-      type
-    })
+      type,
+    });
 
     // Error codes from https://github.com/vegaprotocol/vega/blob/develop/core/blockchain/response.go
     switch (res.code) {
       case 0:
-        return res
+        return res;
 
       case 51:
-        throw new NodeRPC.TxErrors.AbciTxnValidationFailure(toString(fromHex(res.data)), res.code)
+        throw new NodeRPC.TxErrors.AbciTxnValidationFailure(
+          toString(fromHex(res.data)),
+          res.code,
+        );
 
       // AbciTxnDecodingFailure code is returned when CheckTx or DeliverTx fail to decode the Txn.
       case 60:
-        throw new NodeRPC.TxErrors.AbciTxnDecodingFailure(toString(fromHex(res.data)), res.code)
+        throw new NodeRPC.TxErrors.AbciTxnDecodingFailure(
+          toString(fromHex(res.data)),
+          res.code,
+        );
 
       // AbciTxnInternalError code is returned when CheckTx or DeliverTx fail to process the Txn.
       case 70:
-        throw new NodeRPC.TxErrors.AbciTxnInternalError(toString(fromHex(res.data)), res.code)
+        throw new NodeRPC.TxErrors.AbciTxnInternalError(
+          toString(fromHex(res.data)),
+          res.code,
+        );
 
       // AbciUnknownCommandError code is returned when the app doesn't know how to handle a given command.
       case 80:
-        throw new NodeRPC.TxErrors.AbciUnknownCommandError(toString(fromHex(res.data)), res.code)
+        throw new NodeRPC.TxErrors.AbciUnknownCommandError(
+          toString(fromHex(res.data)),
+          res.code,
+        );
 
       // AbciSpamError code is returned when CheckTx or DeliverTx fail spam protection tests.
       case 89:
-        throw new NodeRPC.TxErrors.AbciSpamError(toString(fromHex(res.data)), res.code)
+        throw new NodeRPC.TxErrors.AbciSpamError(
+          toString(fromHex(res.data)),
+          res.code,
+        );
     }
   }
 
   static isTxError(err) {
-    return err instanceof NodeRPC.TxErrors.AbciTxnValidationFailure ||
+    return (
+      err instanceof NodeRPC.TxErrors.AbciTxnValidationFailure ||
       err instanceof NodeRPC.TxErrors.AbciTxnDecodingFailure ||
       err instanceof NodeRPC.TxErrors.AbciTxnInternalError ||
       err instanceof NodeRPC.TxErrors.AbciUnknownCommandError ||
       err instanceof NodeRPC.TxErrors.AbciSpamError
+    );
   }
 
   static TxErrors = {
     AbciTxnValidationFailure: class extends Error {
       constructor(msg, code) {
-        super(msg)
-        this.code = code
+        super(msg);
+        this.code = code;
       }
     },
     AbciTxnDecodingFailure: class extends Error {
       constructor(msg, code) {
-        super(msg)
-        this.code = code
+        super(msg);
+        this.code = code;
       }
     },
     AbciTxnInternalError: class extends Error {
       constructor(msg, code) {
-        super(msg)
-        this.code = code
+        super(msg);
+        this.code = code;
       }
     },
     AbciUnknownCommandError: class extends Error {
       constructor(msg, code) {
-        super(msg)
-        this.code = code
+        super(msg);
+        this.code = code;
       }
     },
     AbciSpamError: class extends Error {
       constructor(msg, code) {
-        super(msg)
-        this.code = code
+        super(msg);
+        this.code = code;
       }
     },
-  }
+  };
 }
