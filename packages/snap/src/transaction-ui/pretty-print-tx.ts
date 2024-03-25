@@ -60,7 +60,6 @@ export function prettyPrintTx(
   formatNumber: ReturnType<typeof getFormatNumber>,
 ) {
   const keys = Object.keys(tx);
-  console.log(formatNumber('10000000'));
 
   if (keys.length !== 1) {
     throw invalidParameters('Invalid transaction');
