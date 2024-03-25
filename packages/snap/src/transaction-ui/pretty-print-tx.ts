@@ -23,10 +23,17 @@ import {
  * @param tx - The transaction to be pretty printed.
  * @param textFn - The text function to be use for rendering.
  * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
+ * @param formatNumber
  * @returns List of snap-ui elements.
  */
-export function prettyPrintTx(tx: any, textFn: any, enrichmentData: any) {
+export function prettyPrintTx(
+  tx: any,
+  textFn: any,
+  enrichmentData: any,
+  formatNumber: (number: string) => string,
+) {
   const keys = Object.keys(tx);
+  console.log(formatNumber('10000000'));
 
   if (keys.length !== 1) {
     throw invalidParameters('Invalid transaction');

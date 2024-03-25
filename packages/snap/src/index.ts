@@ -12,6 +12,7 @@ import {
   transactionFailed,
 } from './errors';
 import { transactionTitle } from './transaction-ui/transaction-title';
+import { getFormatNumber } from './transaction-ui/utils';
 
 /**
  * List the keys in the wallet.
@@ -99,6 +100,10 @@ async function sendTransaction(origin: string, request: JsonRpcRequest) {
   // or not containing an existing supported command.
   transactionTitle(transaction);
 
+  const locale = await snap.request({
+    method: 'snap_getLocale',
+  });
+  const formatNumber = getFormatNumber(locale);
   const sanitizedTransaction = await txs.sanitizeCommand(transaction);
   const assets = await node.getJSON('api/v2/assets');
   const markets = await node.getJSON('api/v2/markets');
@@ -113,6 +118,7 @@ async function sendTransaction(origin: string, request: JsonRpcRequest) {
       assets,
       markets,
     },
+    formatNumber,
   );
 
   if (approved !== true) {
