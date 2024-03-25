@@ -103,6 +103,7 @@ async function sendTransaction(origin: string, request: JsonRpcRequest) {
   const locale = await snap.request({
     method: 'snap_getLocale',
   });
+  // TODO: the date should be the same here
   const formatNumber = getFormatNumber(locale);
   const sanitizedTransaction = await txs.sanitizeCommand(transaction);
   const assets = await node.getJSON('api/v2/assets');
