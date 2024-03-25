@@ -14,6 +14,17 @@ import {
 import { transactionTitle } from './transaction-ui/transaction-title';
 import { getFormatNumber } from './transaction-ui/utils';
 
+const fetchWithTimeout = async (node: rpc, path: string) => {
+  try {
+    const controller = new AbortController();
+    setTimeout(() => controller.abort(), 5000);
+    const res = await node.getJSON(path, { signal: controller.signal });
+    return res;
+  } catch (e) {
+    return null;
+  }
+};
+
 /**
  * List the keys in the wallet.
  */
@@ -106,8 +117,10 @@ async function sendTransaction(origin: string, request: JsonRpcRequest) {
   // TODO: the date should be the same here
   const formatNumber = getFormatNumber(locale);
   const sanitizedTransaction = await txs.sanitizeCommand(transaction);
-  const assets = await node.getJSON('api/v2/assets');
-  const markets = await node.getJSON('api/v2/markets');
+  const [assets, markets] = await Promise.all([
+    fetchWithTimeout(node, 'api/v2/assets'),
+    fetchWithTimeout(node, 'api/v2/markets'),
+  ]);
   // Transaction validation is somewhat handled down in this function.
   // Could be improved and made more explicit.
   const approved = await reviewTransaction(
