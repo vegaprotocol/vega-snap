@@ -1,9 +1,6 @@
 import { text, divider, copyable } from '@metamask/snaps-sdk';
 import {
-  addDecimal,
   formatTimestamp,
-  getAccountType,
-  getAssetById,
   getExpiryStrategy,
   getFormatNumber,
   getMarginMode,
@@ -16,6 +13,10 @@ import {
 } from '../utils';
 import { prettyPrintTx } from '../pretty-print-tx';
 import { EnrichmentData, VegaTransaction } from '../../types';
+import { prettyPrintTransferFunds } from './transfer';
+import { prettyPrint } from './pretty-print';
+
+export { prettyPrintTransferFunds, prettyPrint };
 
 /**
  * Pretty print a batch market instructions transaction.
@@ -193,90 +194,6 @@ export function prettyPrintApplyReferralCode(
  */
 export function prettyPrintJoinTeam(tx: VegaTransaction, textFn: typeof text) {
   const elms = [textFn(`Join team: ${minimiseId(tx.id)}`)];
-
-  return elms;
-}
-
-/**
- * Pretty prints a transfer funds transaction.
- *
- * @param tx - The transfer funds transaction.
- * @param textFn - The text function to be used for rendering.
- * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
- * @param formatNumber - Function to format numbers based on the user's locale.
- * @returns List of snap-ui elements.
- */
-export function prettyPrintTransferFunds(
-  tx: VegaTransaction,
-  textFn: typeof text,
-  enrichmentData: EnrichmentData,
-  formatNumber: ReturnType<typeof getFormatNumber>,
-) {
-  const asset = getAssetById(enrichmentData, tx.asset);
-  // handle only oneOff transfer, all others should be
-  // the default prettyPrint
-  if (!tx.oneOff && !tx.kind?.oneOff) {
-    return prettyPrint(tx);
-  }
-
-  const amount =
-    asset?.symbol && asset?.decimals
-      ? [
-          textFn(
-            `**Amount**: ${formatNumber(
-              addDecimal(tx.amount, asset.decimals),
-            )}&nbsp;${asset.symbol}`,
-          ),
-        ]
-      : [textFn(`**Amount**: ${tx.amount}`)];
-
-  const elms = [
-    textFn(`**Amount**: ${amount}`),
-    textFn(`**Asset ID**:`),
-    copyable(`${tx.asset}`),
-    textFn(`**To**:`),
-    copyable(`${tx.to}`),
-  ];
-
-  // we do not want to display if it's general account too.
-  if (
-    tx.toAccountType !== undefined &&
-    tx.toAccountType !== null &&
-    tx.toAccountType !== 'ACCOUNT_TYPE_GENERAL' &&
-    tx.toAccountType !== ''
-  ) {
-    elms.push(
-      textFn(`**To Account Type**: ${getAccountType(tx.toAccountType)}`),
-    );
-  }
-
-  if (
-    tx.reference !== undefined &&
-    tx.reference !== null &&
-    tx.reference !== ''
-  ) {
-    elms.push(textFn(`**Reference**: ${tx.reference}`));
-  }
-
-  if (
-    tx.kind?.oneOff?.deliverOn !== null &&
-    tx.kind?.oneOff?.deliverOn !== undefined &&
-    tx.kind?.oneOff?.deliverOn !== BigInt(0)
-  ) {
-    elms.push(
-      textFn(
-        `**Deliver On**: ${formatTimestamp(Number(tx.kind.oneOff.deliverOn))}`,
-      ),
-    );
-  } else if (
-    tx.oneOff?.deliverOn !== null &&
-    tx.oneOff?.deliverOn !== undefined &&
-    tx.oneOff?.deliverOn !== BigInt(0)
-  ) {
-    elms.push(
-      textFn(`**Deliver On**: ${formatTimestamp(Number(tx.oneOff.deliverOn))}`),
-    );
-  }
 
   return elms;
 }
@@ -750,31 +667,4 @@ export function prettyPrintStopOrdersCancellation(
     ];
   }
   return [textFn(`Cancel all stop orders from all markets`)];
-}
-
-/**
- * Recurively pretty prints an object as snap-ui elements.
- *
- * @param obj - Object to pretty print. Primitives will be coerced to strings, while objects will be recursed into.
- * @returns List of snap-ui elements.
- */
-export function prettyPrint(obj: any) {
-  const elms = [];
-
-  if (obj === null || obj === undefined) {
-    return [text(`**Empty transaction provided**`)];
-  }
-
-  for (const [key, val] of Object.entries(obj)) {
-    if (val === null || val === undefined) {
-      elms.push(text(`**${key}**: empty value`));
-    } else if (typeof val === 'object') {
-      elms.push(text(`**${key}**: `));
-      elms.push(...prettyPrint(val));
-    } else {
-      elms.push(text(`**${key}**: ${val}`));
-    }
-  }
-
-  return elms;
 }

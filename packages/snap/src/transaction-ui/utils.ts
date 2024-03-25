@@ -37,7 +37,7 @@ export function addDecimal(number: string, decimals: number) {
  * @returns The asset with the given id, or undefined if it does not exist.
  */
 export function getAssetById(enrichmentData: any, id: string) {
-  const node = enrichmentData?.assets?.edges?.find(
+  const node = enrichmentData?.assets?.assets?.edges?.find(
     (edge: any) => edge?.node?.id === id,
   );
   return node?.node;

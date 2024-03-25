@@ -28,7 +28,6 @@ export async function reviewTransaction(
   const content = panel([
     heading(transactionTitle(transaction)),
     text(`Request from: **${origin}**`),
-    text(JSON.stringify(enrichmentData, null, 2)),
     divider(),
     ...prettyPrintTx(transaction, text, enrichmentData, formatNumber),
     divider(),
