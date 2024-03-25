@@ -1,5 +1,6 @@
 import { panel, heading, text, divider, copyable } from '@metamask/snaps-sdk';
-import { minimiseId } from './utils';
+import { EnrichmentData, VegaTransaction } from '../types';
+import { getFormatNumber, minimiseId } from './utils';
 import { transactionTitle } from './transaction-title';
 import { prettyPrintTx } from './pretty-print-tx';
 
@@ -17,11 +18,11 @@ import { prettyPrintTx } from './pretty-print-tx';
  */
 export async function reviewTransaction(
   origin: string,
-  transaction: any,
+  transaction: VegaTransaction,
   selectedNetworkEntrypoint: URL,
   pair: any,
-  enrichmentData: any,
-  formatNumber: (n: string) => string,
+  enrichmentData: EnrichmentData,
+  formatNumber: ReturnType<typeof getFormatNumber>,
 ) {
   const publicKey = pair.keyPair.publicKey.toString();
   const content = panel([

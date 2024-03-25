@@ -1,4 +1,5 @@
 import { invalidParameters } from '../errors';
+import { VegaTransaction } from '../types';
 
 /**
  * Formats a human readable transaction title based on the transaction command.
@@ -6,7 +7,7 @@ import { invalidParameters } from '../errors';
  * @param tx - Object with a single command property. Uusally the incoming `transaction` property from `client.send_transaction`.
  * @returns A human readable transaction title.
  */
-export function transactionTitle(tx: any): string {
+export function transactionTitle(tx: VegaTransaction): string {
   const keys = Object.keys(tx);
 
   if (keys.length !== 1) {
