@@ -12,7 +12,7 @@ import { prettyPrintTx } from './pretty-print-tx';
  * @param selectedNetworkEntrypoint - The selected network entrypoint as a URL. The origin is displayed to the user.
  * @param pair - The selected public key.
  * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
- * @param formatNumber
+ * @param formatNumber - Function to format numbers based on the user's locale.
  * @returns `true` if the user approves the transaction, `false` otherwise.
  */
 export async function reviewTransaction(
