@@ -1,7 +1,9 @@
 import { text, divider, copyable } from '@metamask/snaps-sdk';
 import {
+  addDecimal,
   formatTimestamp,
   getAccountType,
+  getAssetById,
   getExpiryStrategy,
   getFormatNumber,
   getMarginMode,
@@ -200,20 +202,36 @@ export function prettyPrintJoinTeam(tx: VegaTransaction, textFn: typeof text) {
  *
  * @param tx - The transfer funds transaction.
  * @param textFn - The text function to be used for rendering.
+ * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
+ * @param formatNumber - Function to format numbers based on the user's locale.
  * @returns List of snap-ui elements.
  */
 export function prettyPrintTransferFunds(
   tx: VegaTransaction,
   textFn: typeof text,
+  enrichmentData: EnrichmentData,
+  formatNumber: ReturnType<typeof getFormatNumber>,
 ) {
+  const asset = getAssetById(enrichmentData, tx.asset);
   // handle only oneOff transfer, all others should be
   // the default prettyPrint
   if (!tx.oneOff && !tx.kind?.oneOff) {
     return prettyPrint(tx);
   }
 
+  const amount =
+    asset?.symbol && asset?.decimals
+      ? [
+          textFn(
+            `**Amount**: ${formatNumber(
+              addDecimal(tx.amount, asset.decimals),
+            )}&nbsp;${asset.symbol}`,
+          ),
+        ]
+      : [textFn(`**Amount**: ${tx.amount}`)];
+
   const elms = [
-    textFn(`**Amount**: ${tx.amount}`),
+    textFn(`**Amount**: ${amount}`),
     textFn(`**Asset ID**:`),
     copyable(`${tx.asset}`),
     textFn(`**To**:`),
