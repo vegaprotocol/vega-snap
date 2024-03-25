@@ -8,7 +8,7 @@ import { invalidParameters } from '../errors';
  * @returns A function that takes a number and returns a string formatted based on the locale.
  */
 export function getFormatNumber(locale: string) {
-  return (n: number) => n.toLocaleString(locale);
+  return (n: string) => Number(n).toLocaleString(locale);
 }
 
 /**

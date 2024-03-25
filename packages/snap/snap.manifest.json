@@ -27,14 +27,11 @@
     },
     "snap_getBip32Entropy": [
       {
-        "path": [
-          "m",
-          "1789'",
-          "0'"
-        ],
+        "path": ["m", "1789'", "0'"],
         "curve": "ed25519"
       }
-    ]
+    ],
+    "snap_getLocale": {}
   },
   "manifestVersion": "0.1"
 }

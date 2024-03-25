@@ -12,6 +12,7 @@ import { prettyPrintTx } from './pretty-print-tx';
  * @param selectedNetworkEntrypoint - The selected network entrypoint as a URL. The origin is displayed to the user.
  * @param pair - The selected public key.
  * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
+ * @param formatNumber
  * @returns `true` if the user approves the transaction, `false` otherwise.
  */
 export async function reviewTransaction(
@@ -20,6 +21,7 @@ export async function reviewTransaction(
   selectedNetworkEntrypoint: URL,
   pair: any,
   enrichmentData: any,
+  formatNumber: (n: string) => string,
 ) {
   const publicKey = pair.keyPair.publicKey.toString();
   const content = panel([
@@ -27,7 +29,7 @@ export async function reviewTransaction(
     text(`Request from: **${origin}**`),
     text(JSON.stringify(enrichmentData, null, 2)),
     divider(),
-    ...prettyPrintTx(transaction, text, enrichmentData),
+    ...prettyPrintTx(transaction, text, enrichmentData, formatNumber),
     divider(),
     text(`Selected key: Snap Key ${pair.index} (${minimiseId(publicKey)})`),
     divider(),
