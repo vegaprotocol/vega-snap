@@ -1,7 +1,7 @@
 import { createServer } from 'node:http';
 import { installSnap } from '@metamask/snaps-jest';
 import { expect } from '@jest/globals';
-import { Heading, Panel } from '@metamask/snaps-sdk';
+import type { Heading, Panel } from '@metamask/snaps-sdk';
 import { assert } from '@metamask/utils';
 
 /**

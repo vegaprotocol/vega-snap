@@ -1,6 +1,7 @@
 import { panel, heading, text, divider, copyable } from '@metamask/snaps-sdk';
-import { EnrichmentData, VegaTransaction } from '../types';
-import { getFormatNumber, minimiseId } from './utils';
+import type { EnrichmentData, VegaTransaction } from '../types';
+import type { getFormatNumber } from './utils';
+import { minimiseId } from './utils';
 import { transactionTitle } from './transaction-title';
 import { prettyPrintTx } from './pretty-print-tx';
 

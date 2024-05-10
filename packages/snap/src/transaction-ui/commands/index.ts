@@ -1,8 +1,8 @@
 import { text, divider, copyable } from '@metamask/snaps-sdk';
+import type { getFormatNumber } from '../utils';
 import {
   formatTimestamp,
   getExpiryStrategy,
-  getFormatNumber,
   getMarginMode,
   getPeggedReference,
   getSide,
@@ -12,7 +12,7 @@ import {
   minimiseId,
 } from '../utils';
 import { prettyPrintTx } from '../pretty-print-tx';
-import { EnrichmentData, VegaTransaction } from '../../types';
+import type { EnrichmentData, VegaTransaction } from '../../types';
 import { prettyPrintTransferFunds } from './transfer';
 import { prettyPrint } from './pretty-print';
 
