@@ -15,37 +15,9 @@ import { prettyPrintTx } from '../pretty-print-tx';
 import type { EnrichmentData, VegaTransaction } from '../../types';
 import { prettyPrintTransferFunds } from './transfer';
 import { prettyPrint } from './pretty-print';
+import { prettyPrintUpdateMarginMode } from './margin-mode';
 
-export { prettyPrintTransferFunds, prettyPrint };
-
-/**
- * Pretty print a batch market instructions transaction.
- *
- * @param tx - The transaction.
- * @param textFn - The text function used for rendering.
- * @returns List of snap-ui elements.
- */
-export function prettyPrintUpdateMarginMode(
-  tx: VegaTransaction,
-  textFn: typeof text,
-) {
-  const mode = getMarginMode(tx.mode);
-  let marketId = minimiseId(tx.marketId);
-  if (marketId === '') {
-    marketId = 'Invalid market';
-  }
-  const elms = [
-    textFn(`Update market **${marketId}** margin mode to **${mode}**`),
-  ];
-
-  if (mode === 'Isolated margin') {
-    const leverage = 1 / Number(tx.marginFactor);
-    elms.push(textFn(`**Margin factor**: ${tx.marginFactor}`));
-    elms.push(textFn(`**Leverage**: ${leverage.toFixed(2)}`));
-  }
-
-  return elms;
-}
+export { prettyPrintTransferFunds, prettyPrintUpdateMarginMode, prettyPrint };
 
 /**
  * Pretty prints an update party profile transaction.
