@@ -3,7 +3,6 @@ import type { getFormatNumber } from '../utils';
 import {
   formatTimestamp,
   getExpiryStrategy,
-  getMarginMode,
   getPeggedReference,
   getSide,
   getTimeInForce,
