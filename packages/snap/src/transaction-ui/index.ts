@@ -28,12 +28,10 @@ export async function reviewTransaction(
   const content = panel([
     heading(transactionTitle(transaction)),
     text(`Request from: **${origin}**`),
+    text(`Selected key: Snap Key ${pair.index} (${minimiseId(publicKey)})`),
+    text(`Selected network entrypoint: ${selectedNetworkEntrypoint.origin}`),
     divider(),
     ...prettyPrintTx(transaction, text, enrichmentData, formatNumber),
-    divider(),
-    text(`Selected key: Snap Key ${pair.index} (${minimiseId(publicKey)})`),
-    divider(),
-    text(`Selected network entrypoint: ${selectedNetworkEntrypoint.origin}`),
     divider(),
     text('Raw transaction:'),
     copyable(
