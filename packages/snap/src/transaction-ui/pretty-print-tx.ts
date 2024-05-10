@@ -1,6 +1,6 @@
-import { text } from '@metamask/snaps-sdk';
+import type { text } from '@metamask/snaps-sdk';
 import { invalidParameters } from '../errors';
-import { EnrichmentData, VegaTransaction } from '../types';
+import type { EnrichmentData, VegaTransaction } from '../types';
 import {
   prettyPrintBatchMarketInstructions,
   prettyPrintOrderSubmission,
@@ -18,7 +18,7 @@ import {
   prettyPrintUpdatePartyProfile,
   prettyPrint,
 } from './commands';
-import { getFormatNumber } from './utils';
+import type { getFormatNumber } from './utils';
 
 type PrettyPrintTxFn = (
   tx: VegaTransaction,

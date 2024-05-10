@@ -1,7 +1,8 @@
-import { text, copyable } from '@metamask/snaps-sdk';
-import { VegaTransaction, EnrichmentData } from '../../types';
+import type { text } from '@metamask/snaps-sdk';
+import { copyable } from '@metamask/snaps-sdk';
+import type { VegaTransaction, EnrichmentData } from '../../types';
+import type { getFormatNumber } from '../utils';
 import {
-  getFormatNumber,
   getAssetById,
   addDecimal,
   getAccountType,

@@ -1,4 +1,4 @@
-import { OnRpcRequestHandler, JsonRpcRequest } from '@metamask/snaps-sdk';
+import type { OnRpcRequestHandler, JsonRpcRequest } from '@metamask/snaps-sdk';
 import rpc from './node-rpc';
 import * as txs from './transaction';
 import { deriveKeyPair } from './keys';
