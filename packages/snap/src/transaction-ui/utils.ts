@@ -1,5 +1,6 @@
 import { text } from '@metamask/snaps-sdk';
 import { invalidParameters } from '../errors';
+import type { EnrichmentData } from '../types';
 
 /**
  * Formats a number based on the locale of the user.
@@ -36,7 +37,7 @@ export function addDecimal(number: string, decimals: number) {
  * @param id - The id of the asset to be found.
  * @returns The asset with the given id, or undefined if it does not exist.
  */
-export function getAssetById(enrichmentData: any, id: string) {
+export function getAssetById(enrichmentData: EnrichmentData, id: string) {
   const node = enrichmentData?.assets?.assets?.edges?.find(
     (edge: any) => edge?.node?.id === id,
   );
@@ -51,8 +52,8 @@ export function getAssetById(enrichmentData: any, id: string) {
  * @param id - The id of the market to be found.
  * @returns The market with the given id, or undefined if it does not exist.
  */
-export function getMarketById(enrichmentData: any, id: string) {
-  const node = enrichmentData?.markets?.edges?.find(
+export function getMarketById(enrichmentData: EnrichmentData, id: string) {
+  const node = enrichmentData?.markets?.markets?.edges?.find(
     (edge: any) => edge?.node?.id === id,
   );
   return node?.node;
