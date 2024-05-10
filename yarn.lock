@@ -8415,6 +8415,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@vegaprotocol/rest-clients@npm:^0.0.5":
+  version: 0.0.5
+  resolution: "@vegaprotocol/rest-clients@npm:0.0.5"
+  checksum: 0f8247490c2025a53d6f928a1f9a2a1be7c8fda9b1637e75ad9428697532cb06d77b2415d7227d4e3032e50664f0628cf0393aab25cd70e9836a2ea2e560cdf1
+  languageName: node
+  linkType: hard
+
 "@vegaprotocol/snap-monorepo@workspace:.":
   version: 0.0.0-use.local
   resolution: "@vegaprotocol/snap-monorepo@workspace:."

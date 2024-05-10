@@ -37,7 +37,7 @@ export function prettyPrintTransferFunds(
   const amount =
     symbol && decimals
       ? `**Amount**: ${formatNumber(
-          addDecimal(tx.amount, decimals),
+          addDecimal(tx.amount, Number(decimals)),
         )}&nbsp;${symbol}`
       : `**Amount**: ${tx.amount}`;
 
