@@ -1,4 +1,4 @@
-import { text, divider, copyable } from '@metamask/snaps-sdk';
+import { text, divider } from '@metamask/snaps-sdk';
 import type { getFormatNumber } from '../utils';
 import {
   formatTimestamp,
@@ -15,8 +15,14 @@ import type { EnrichmentData, VegaTransaction } from '../../types';
 import { prettyPrintTransferFunds } from './transfer';
 import { prettyPrint } from './pretty-print';
 import { prettyPrintUpdateMarginMode } from './margin-mode';
+import { prettyPrintWithdrawSubmission } from './withdrawal-submission';
 
-export { prettyPrintTransferFunds, prettyPrintUpdateMarginMode, prettyPrint };
+export {
+  prettyPrintTransferFunds,
+  prettyPrintUpdateMarginMode,
+  prettyPrintWithdrawSubmission,
+  prettyPrint,
+};
 
 /**
  * Pretty prints an update party profile transaction.
@@ -165,31 +171,6 @@ export function prettyPrintApplyReferralCode(
  */
 export function prettyPrintJoinTeam(tx: VegaTransaction, textFn: typeof text) {
   const elms = [textFn(`Join team: ${minimiseId(tx.id)}`)];
-
-  return elms;
-}
-
-/**
- * Pretty prints a windrawal submission.
- *
- * @param tx - The withdrawal submission transaction.
- * @param textFn - The text function used for rendering.
- * @returns List of snap-ui elements.
- */
-export function prettyPrintWithdrawSubmission(
-  tx: VegaTransaction,
-  textFn: typeof text,
-) {
-  const elms = [
-    textFn(`**Amount**: ${tx.amount}`),
-    textFn(`**Asset ID**:`),
-    copyable(`${tx.asset}`),
-  ];
-
-  if (tx.ext?.erc20?.receiverAddress) {
-    elms.push(textFn(`**To Address**: `));
-    elms.push(copyable(`${tx.ext?.erc20?.receiverAddress}`));
-  }
 
   return elms;
 }
