@@ -8,7 +8,6 @@ import {
   prettyPrintOrderAmendment,
   prettyPrintStopOrdersSubmission,
   prettyPrintStopOrdersCancellation,
-  prettyPrintWithdrawSubmission,
   prettyPrintTransferFunds,
   prettyPrintUpdateMarginMode,
   prettyPrintCreateReferralSet,
@@ -17,6 +16,7 @@ import {
   prettyPrintJoinTeam,
   prettyPrintUpdatePartyProfile,
   prettyPrint,
+  prettyPrintWithdrawSubmission,
 } from './commands';
 import type { getFormatNumber } from './utils';
 
