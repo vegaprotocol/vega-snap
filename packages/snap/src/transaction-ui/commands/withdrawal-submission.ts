@@ -1,7 +1,7 @@
 import type { text } from '@metamask/snaps-sdk';
 import { copyable } from '@metamask/snaps-sdk';
 import type { EnrichmentData, VegaTransaction } from '../../types';
-import { formatDecimal, type getFormatNumber } from '../utils';
+import { formatAssetAmount, type getFormatNumber } from '../utils';
 
 /**
  * Pretty prints a windrawal submission.
@@ -18,7 +18,7 @@ export function prettyPrintWithdrawSubmission(
   enrichmentData: EnrichmentData,
   formatNumber: ReturnType<typeof getFormatNumber>,
 ) {
-  const amount = formatDecimal(
+  const amount = formatAssetAmount(
     tx.amount,
     tx.asset,
     enrichmentData,

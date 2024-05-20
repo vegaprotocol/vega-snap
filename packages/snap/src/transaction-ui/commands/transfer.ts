@@ -2,7 +2,7 @@ import type { text } from '@metamask/snaps-sdk';
 import { copyable } from '@metamask/snaps-sdk';
 import type { VegaTransaction, EnrichmentData } from '../../types';
 import type { getFormatNumber } from '../utils';
-import { getAccountType, formatTimestamp, formatDecimal } from '../utils';
+import { getAccountType, formatTimestamp, formatAssetAmount } from '../utils';
 import { prettyPrint } from './pretty-print';
 
 /**
@@ -26,7 +26,7 @@ export function prettyPrintTransferFunds(
     return prettyPrint(tx);
   }
 
-  const amount = formatDecimal(
+  const amount = formatAssetAmount(
     tx.amount,
     tx.asset,
     enrichmentData,
