@@ -234,7 +234,7 @@ export function getMarginMode(mode: string) {
  * @param formatNumber - Function to format numbers based on the user's locale.
  * @returns The human readable string.
  */
-export const formatDecimal = (
+export const formatAssetAmount = (
   amount: string,
   assetId: string,
   enrichmentData: EnrichmentData,
@@ -250,4 +250,38 @@ export const formatDecimal = (
     )}&nbsp;${symbol}`;
   }
   return `${amount}`;
+};
+
+export const formatMarketPrice = (
+  amount: string,
+  marketId: string,
+  enrichmentData: EnrichmentData,
+  formatNumber: ReturnType<typeof getFormatNumber>,
+) => {
+  const market = getMarketById(enrichmentData, marketId);
+  const decimals = market?.decimalPlaces;
+  if (decimals) {
+    // TODO: could also get the asset from the market and use that to append the code.
+    // this requires changes per market to figure out the settlement asset so leaving for now.
+    return `${formatNumber(addDecimal(amount, Number(decimals)))}`;
+  }
+  return `${amount}`;
+};
+
+/**
+ * Gets a human readable string representing a market code.
+ *
+ * @param marketId - The id of the market.
+ * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
+ * @returns The human readable string.
+ */
+export const formatMarketCode = (
+  marketId: string,
+  enrichmentData: EnrichmentData,
+) => {
+  const market = getMarketById(enrichmentData, marketId);
+  if (market) {
+    return `${market?.tradableInstrument?.instrument?.code}`;
+  }
+  return `${minimiseId(marketId)}`;
 };
