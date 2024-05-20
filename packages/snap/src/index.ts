@@ -2,7 +2,7 @@ import type { OnRpcRequestHandler, JsonRpcRequest } from '@metamask/snaps-sdk';
 import rpc from './node-rpc';
 import * as txs from './transaction';
 import { deriveKeyPair } from './keys';
-import { reviewTransaction } from './transaction-ui';
+import { reviewTransaction } from './ui';
 import {
   invalidParameters,
   JSONRPCError,
@@ -11,8 +11,8 @@ import {
   transactionDenied,
   transactionFailed,
 } from './errors';
-import { transactionTitle } from './transaction-ui/transaction-title';
-import { getFormatNumber } from './transaction-ui/utils';
+import { transactionTitle } from './transaction-title';
+import { getFormatNumber } from './utils';
 
 const fetchWithTimeout = async (node: rpc, path: string) => {
   try {
