@@ -1,16 +1,13 @@
-import { text, divider } from '@metamask/snaps-sdk';
-import type { getFormatNumber } from '../utils';
+import type { text } from '@metamask/snaps-sdk';
 import {
   formatTimestamp,
   getPeggedReference,
   getSide,
   getTimeInForce,
   indentText,
-  isUnspecified,
   minimiseId,
 } from '../utils';
-import { prettyPrintTx } from '../pretty-print-tx';
-import type { EnrichmentData, VegaTransaction } from '../../types';
+import type { VegaTransaction } from '../../types';
 import { prettyPrintTransferFunds } from './transfer';
 import { prettyPrint } from './pretty-print';
 import { prettyPrintUpdateMarginMode } from './margin-mode';
@@ -18,6 +15,8 @@ import { prettyPrintWithdrawSubmission } from './withdrawal-submission';
 import { prettyPrintStopOrdersSubmission } from './stop-orders-submission';
 import { prettyPrintStopOrdersCancellation } from './stop-orders-cancellation';
 import { prettyPrintCancelOrder } from './order-cancellation';
+import { prettyPrintBatchMarketInstructions } from './batch-market-instructions';
+import { prettyPrintOrderAmendment } from './order-ammendment';
 
 export {
   prettyPrintTransferFunds,
@@ -27,6 +26,8 @@ export {
   prettyPrintStopOrdersSubmission,
   prettyPrintStopOrdersCancellation,
   prettyPrintCancelOrder,
+  prettyPrintBatchMarketInstructions,
+  prettyPrintOrderAmendment,
 };
 
 /**
@@ -243,215 +244,6 @@ export function prettyPrintOrderSubmission(
         `**Iceberg Minimum Visible Size**: ${tx.icebergOpts.minimumVisibleSize}`,
       ),
     );
-  }
-
-  return elms;
-}
-
-/**
- * Pretty print an order amendment.
- *
- * @param tx - The order amendment transaction.
- * @param textFn - The test function used for rendering.
- * @returns List of snap-ui elements.
- */
-export function prettyPrintOrderAmendment(
-  tx: VegaTransaction,
-  textFn: typeof text,
-) {
-  const elms = [
-    textFn(`**Order ID**: ${minimiseId(tx.orderId)}`),
-    textFn(`**Market ID**: ${minimiseId(tx.marketId)}`),
-  ];
-
-  if (tx.price !== undefined && tx.price !== null && tx.price !== '') {
-    elms.push(textFn(`**Price**: ${tx.price}`));
-  }
-
-  if (
-    tx.sizeDelta !== undefined &&
-    tx.sizeDelta !== null &&
-    tx.sizeDelta !== BigInt(0)
-  ) {
-    if (tx.sizeDelta > 0) {
-      elms.push(textFn(`**Size Delta**: +${tx.sizeDelta}`));
-    } else {
-      elms.push(textFn(`**Size Delta**: ${tx.sizeDelta}`));
-    }
-  }
-
-  if (tx.size !== undefined && tx.size !== null && tx.size !== BigInt(0)) {
-    if (tx.size > 0) {
-      elms.push(textFn(`**Size**: +${tx.size}`));
-    } else {
-      elms.push(textFn(`**Size**: ${tx.size}`));
-    }
-  }
-
-  if (
-    tx.expiresAt !== undefined &&
-    tx.expiresAt !== null &&
-    tx.expiresAt !== BigInt(0)
-  ) {
-    elms.push(
-      textFn(`**Expires At**: ${formatTimestamp(Number(tx.expiresAt))}`),
-    );
-  }
-
-  if (
-    tx.timeInForce !== undefined &&
-    tx.timeInForce !== null &&
-    !isUnspecified(tx.timeInForce) &&
-    tx.timeInForce !== ''
-  ) {
-    elms.push(textFn(`**Time In Force**: ${getTimeInForce(tx.timeInForce)}`));
-  }
-
-  if (
-    tx.peggedReference !== undefined &&
-    tx.peggedReference !== null &&
-    !isUnspecified(tx.peggedReference) &&
-    tx.peggedReference !== ''
-  ) {
-    elms.push(
-      textFn(`**Pegged Reference**: ${getPeggedReference(tx.peggedReference)}`),
-    );
-  }
-
-  if (
-    tx.peggedOffset !== undefined &&
-    tx.peggedOffset !== null &&
-    tx.peggedOffset !== ''
-  ) {
-    elms.push(textFn(`**Pegged Offset**: ${tx.peggedOffset}`));
-  }
-
-  return elms;
-}
-
-/**
- * Pretty print a batch market instructions transaction.
- *
- * @param tx - The transaction.
- * @param _ - The text function used for rendering.
- * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
- * @param formatNumber - Function to format numbers based on the user's locale.
- * @returns List of snap-ui elements.
- */
-export function prettyPrintBatchMarketInstructions(
-  tx: VegaTransaction,
-  _: typeof text, // Not used as we wish to indent the text of the sub transaction within the batch market instructions.
-  enrichmentData: EnrichmentData,
-  formatNumber: ReturnType<typeof getFormatNumber>,
-) {
-  const elms = [];
-  let addDivider = false;
-
-  if (tx.cancellations && tx.cancellations.length > 0) {
-    elms.push(text(`**Order Cancellations:**`));
-    for (const [i, c] of tx.cancellations.entries()) {
-      elms.push(text(`__${i + 1}:__`));
-      elms.push(
-        ...prettyPrintTx(
-          { orderCancellation: c },
-          indentText,
-          enrichmentData,
-          formatNumber,
-        ),
-      );
-    }
-    addDivider = true;
-  }
-
-  if (tx.amendments && tx.amendments.length > 0) {
-    if (addDivider) {
-      elms.push(divider());
-    }
-    elms.push(text(`**Order Amendments:**`));
-    for (const [i, c] of tx.amendments.entries()) {
-      elms.push(text(`__${i + 1}:__`));
-      elms.push(
-        ...prettyPrintTx(
-          { orderAmendment: c },
-          indentText,
-          enrichmentData,
-          formatNumber,
-        ),
-      );
-    }
-    addDivider = true;
-  }
-
-  if (tx.submissions && tx.submissions.length > 0) {
-    if (addDivider) {
-      elms.push(divider());
-    }
-    elms.push(text(`**Order Submissions:**`));
-    for (const [i, c] of tx.submissions.entries()) {
-      elms.push(text(`__${i + 1}:__`));
-      elms.push(
-        ...prettyPrintTx(
-          { orderSubmission: c },
-          indentText,
-          enrichmentData,
-          formatNumber,
-        ),
-      );
-    }
-  }
-
-  if (tx.stopOrdersCancellation && tx.stopOrdersCancellation.length > 0) {
-    if (addDivider) {
-      elms.push(divider());
-    }
-    elms.push(text(`**Stop Orders Cancellations:**`));
-    for (const [i, c] of tx.stopOrdersCancellation.entries()) {
-      elms.push(text(`__${i + 1}:__`));
-      elms.push(
-        ...prettyPrintTx(
-          { stopOrdersCancellation: c },
-          indentText,
-          enrichmentData,
-          formatNumber,
-        ),
-      );
-    }
-  }
-
-  if (tx.stopOrdersSubmission && tx.stopOrdersSubmission.length > 0) {
-    if (addDivider) {
-      elms.push(divider());
-    }
-    elms.push(text(`**Stop Orders Submissions:**`));
-    for (const [i, c] of tx.stopOrdersSubmission.entries()) {
-      elms.push(text(`__${i + 1}:__`));
-      elms.push(
-        ...prettyPrintTx(
-          { stopOrdersSubmission: c },
-          indentText,
-          enrichmentData,
-          formatNumber,
-        ),
-      );
-    }
-  }
-
-  if (tx.updateMarginMode && tx.updateMarginMode.length > 0) {
-    if (addDivider) {
-      elms.push(divider());
-    }
-    elms.push(text(`**Margin Mode Updates:**`));
-    for (const [i, c] of tx.updateMarginMode.entries()) {
-      elms.push(text(`__${i + 1}:__`));
-      elms.push(
-        ...prettyPrintTx(
-          { updateMarginMode: c },
-          indentText,
-          enrichmentData,
-          formatNumber,
-        ),
-      );
-    }
   }
 
   return elms;
