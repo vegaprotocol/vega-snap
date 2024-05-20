@@ -246,7 +246,7 @@ export const formatAssetAmount = (
 
   if (symbol && decimals) {
     return `${formatNumber(
-      addDecimal(amount, Number(decimals)),
+      addDecimal(amount.toString(), Number(decimals)),
     )}&nbsp;${symbol}`;
   }
   return `${amount}`;
@@ -263,7 +263,7 @@ export const formatMarketPrice = (
   if (decimals) {
     // TODO: could also get the asset from the market and use that to append the code.
     // this requires changes per market to figure out the settlement asset so leaving for now.
-    return `${formatNumber(addDecimal(amount, Number(decimals)))}`;
+    return `${formatNumber(addDecimal(amount.toString(), Number(decimals)))}`;
   }
   return `${amount}`;
 };
@@ -286,7 +286,7 @@ export const formatSize = (
   const market = getMarketById(enrichmentData, marketId);
   const decimals = market?.decimalPlaces;
   if (decimals) {
-    return `${formatNumber(addDecimal(size, Number(decimals)))}`;
+    return `${formatNumber(addDecimal(size.toString(), Number(decimals)))}`;
   }
   return `${size}`;
 };
