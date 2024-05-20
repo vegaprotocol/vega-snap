@@ -1,8 +1,7 @@
 import type { text } from '@metamask/snaps-sdk';
 import { copyable } from '@metamask/snaps-sdk';
 import type { EnrichmentData, VegaTransaction } from '../../types';
-import type { getFormatNumber } from '../utils';
-import { getAssetById, addDecimal } from '../utils';
+import { formatDecimal, type getFormatNumber } from '../utils';
 
 /**
  * Pretty prints a windrawal submission.
@@ -19,19 +18,15 @@ export function prettyPrintWithdrawSubmission(
   enrichmentData: EnrichmentData,
   formatNumber: ReturnType<typeof getFormatNumber>,
 ) {
-  const asset = getAssetById(enrichmentData, tx.asset);
-  const symbol = asset?.details?.symbol;
-  const decimals = asset?.details?.decimals;
-
-  const amount =
-    symbol && decimals
-      ? `**Amount**: ${formatNumber(
-          addDecimal(tx.amount, Number(decimals)),
-        )}&nbsp;${symbol}`
-      : `**Amount**: ${tx.amount}`;
+  const amount = formatDecimal(
+    tx.amount,
+    tx.asset,
+    enrichmentData,
+    formatNumber,
+  );
 
   const elms = [
-    textFn(amount),
+    textFn(`**Amount**: ${amount}`),
     textFn(`**Asset ID**:`),
     copyable(`${tx.asset}`),
   ];
