@@ -1,12 +1,5 @@
 import type { text } from '@metamask/snaps-sdk';
-import {
-  formatTimestamp,
-  getPeggedReference,
-  getSide,
-  getTimeInForce,
-  indentText,
-  minimiseId,
-} from '../utils';
+import { indentText, minimiseId } from '../utils';
 import type { VegaTransaction } from '../../types';
 import { prettyPrintTransferFunds } from './transfer';
 import { prettyPrint } from './pretty-print';
@@ -17,6 +10,7 @@ import { prettyPrintStopOrdersCancellation } from './stop-orders-cancellation';
 import { prettyPrintCancelOrder } from './order-cancellation';
 import { prettyPrintBatchMarketInstructions } from './batch-market-instructions';
 import { prettyPrintOrderAmendment } from './order-ammendment';
+import { prettyPrintOrderSubmission } from './order-submission';
 
 export {
   prettyPrintTransferFunds,
@@ -28,6 +22,7 @@ export {
   prettyPrintCancelOrder,
   prettyPrintBatchMarketInstructions,
   prettyPrintOrderAmendment,
+  prettyPrintOrderSubmission,
 };
 
 /**
@@ -177,74 +172,6 @@ export function prettyPrintApplyReferralCode(
  */
 export function prettyPrintJoinTeam(tx: VegaTransaction, textFn: typeof text) {
   const elms = [textFn(`Join team: ${minimiseId(tx.id)}`)];
-
-  return elms;
-}
-
-/**
- * Pretty print and Order Submission.
- *
- * @param tx - The order submission transaction.
- * @param textFn - The text function used for rendering.
- * @returns List of snap-ui elements.
- */
-export function prettyPrintOrderSubmission(
-  tx: VegaTransaction,
-  textFn: typeof text,
-) {
-  const elms = [];
-  const isLimit = tx.type === 'TYPE_LIMIT';
-  const side = getSide(tx.side);
-
-  if (tx.peggedOrder && Object.keys(tx.peggedOrder).length !== 0) {
-    elms.push(
-      textFn(
-        `Pegged Limit ${side} - ${getTimeInForce(tx.timeInForce)} ${
-          tx.size
-        } @ ${getPeggedReference(tx.peggedOrder.reference)}+${
-          tx.peggedOrder.offset
-        }`,
-      ),
-    );
-  } else if (isLimit) {
-    elms.push(
-      textFn(
-        `Limit ${side} - ${getTimeInForce(tx.timeInForce)} ${tx.size} @ ${
-          tx.price
-        }`,
-      ),
-    );
-  } else {
-    elms.push(
-      textFn(`Market ${side} - ${getTimeInForce(tx.timeInForce)} ${tx.size}`),
-    );
-  }
-
-  const marketId = minimiseId(tx.marketId);
-  elms.push(textFn(`**Market ID**: ${marketId}`));
-
-  if (tx.expiresAt && tx.expiresAt > BigInt(0)) {
-    elms.push(
-      textFn(`**Expires At**: ${formatTimestamp(Number(tx.expiresAt))}`),
-    );
-  }
-
-  if (tx.postOnly) {
-    elms.push(textFn(`**Post Only**: yes`));
-  }
-
-  if (tx.reduceOnly) {
-    elms.push(textFn(`**Reduce Only**: yes`));
-  }
-
-  if (tx.icebergOpts && Object.keys(tx.icebergOpts).length !== 0) {
-    elms.push(textFn(`**Iceberg Peak Size**: ${tx.icebergOpts.peakSize}`));
-    elms.push(
-      textFn(
-        `**Iceberg Minimum Visible Size**: ${tx.icebergOpts.minimumVisibleSize}`,
-      ),
-    );
-  }
 
   return elms;
 }
