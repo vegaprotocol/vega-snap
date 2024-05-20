@@ -16,6 +16,8 @@ import { prettyPrint } from './pretty-print';
 import { prettyPrintUpdateMarginMode } from './margin-mode';
 import { prettyPrintWithdrawSubmission } from './withdrawal-submission';
 import { prettyPrintStopOrdersSubmission } from './stop-orders-submission';
+import { prettyPrintStopOrdersCancellation } from './stop-orders-cancellation';
+import { prettyPrintCancelOrder } from './order-cancellation';
 
 export {
   prettyPrintTransferFunds,
@@ -23,6 +25,8 @@ export {
   prettyPrintWithdrawSubmission,
   prettyPrint,
   prettyPrintStopOrdersSubmission,
+  prettyPrintStopOrdersCancellation,
+  prettyPrintCancelOrder,
 };
 
 /**
@@ -451,72 +455,4 @@ export function prettyPrintBatchMarketInstructions(
   }
 
   return elms;
-}
-
-/**
- * Pretty print a cancel order transaction.
- *
- * @param tx - The cancel order transaction.
- * @param textFn - The text function used for rendering.
- * @returns List of snap-ui elements.
- */
-export function prettyPrintCancelOrder(
-  tx: VegaTransaction,
-  textFn: typeof text,
-) {
-  const hasOrderId =
-    tx.orderId !== undefined && tx.orderId !== null && tx.orderId !== '';
-  const hasMarketId =
-    tx.marketId !== undefined && tx.marketId !== null && tx.marketId !== '';
-
-  if (hasOrderId && hasMarketId) {
-    return [
-      textFn(`Cancel order`),
-      textFn(`**Order ID**: ${minimiseId(tx.orderId)}`),
-      textFn(`**Market ID**: ${minimiseId(tx.marketId)}`),
-    ];
-  } else if (hasOrderId) {
-    return [textFn(`Cancel order ${minimiseId(tx.orderId)}`)];
-  } else if (hasMarketId) {
-    return [
-      textFn(`Cancel all orders on market`),
-      textFn(`**Market ID**: ${minimiseId(tx.marketId)}`),
-    ];
-  }
-  return [textFn(`Cancel all orders from all markets`)];
-}
-
-/**
- * Pretty print a cancel stop order transaction.
- *
- * @param tx - The cancel stop order transaction.
- * @param textFn - The text function used for rendering.
- * @returns List of snap-ui elements.
- */
-export function prettyPrintStopOrdersCancellation(
-  tx: VegaTransaction,
-  textFn: typeof text,
-) {
-  const hasOrderId =
-    tx.orderId !== undefined &&
-    tx.stopOrderId !== null &&
-    tx.stopOrderId !== '';
-  const hasMarketId =
-    tx.marketId !== undefined && tx.marketId !== null && tx.marketId !== '';
-
-  if (hasOrderId && hasMarketId) {
-    return [
-      textFn(`Cancel stop order`),
-      textFn(`**Stop Order ID**: ${minimiseId(tx.stopOrderId)}`),
-      textFn(`**Market ID**: ${minimiseId(tx.marketId)}`),
-    ];
-  } else if (hasOrderId) {
-    return [textFn(`Cancel stop order ${minimiseId(tx.stopOrderId)}`)];
-  } else if (hasMarketId) {
-    return [
-      textFn(`Cancel all stop orders on market`),
-      textFn(`**Market ID**: ${minimiseId(tx.marketId)}`),
-    ];
-  }
-  return [textFn(`Cancel all stop orders from all markets`)];
 }
