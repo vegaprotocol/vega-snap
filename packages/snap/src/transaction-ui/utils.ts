@@ -224,3 +224,30 @@ export function getMarginMode(mode: string) {
       throw invalidParameters('Unknown Margin Mode');
   }
 }
+
+/**
+ * Gets a human readable string representing a margin asset.
+ *
+ * @param amount - The amount of the asset.
+ * @param assetId - The id of the asset.
+ * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
+ * @param formatNumber - Function to format numbers based on the user's locale.
+ * @returns The human readable string.
+ */
+export const formatDecimal = (
+  amount: string,
+  assetId: string,
+  enrichmentData: EnrichmentData,
+  formatNumber: ReturnType<typeof getFormatNumber>,
+) => {
+  const asset = getAssetById(enrichmentData, assetId);
+  const symbol = asset?.details?.symbol;
+  const decimals = asset?.details?.decimals;
+
+  if (symbol && decimals) {
+    return `${formatNumber(
+      addDecimal(amount, Number(decimals)),
+    )}&nbsp;${symbol}`;
+  }
+  return `${amount}`;
+};
