@@ -1,6 +1,6 @@
 import { text } from '@metamask/snaps-sdk';
-import { invalidParameters } from '../errors';
-import type { EnrichmentData } from '../types';
+import { invalidParameters } from './errors';
+import type { EnrichmentData } from './types';
 
 /**
  * Formats a number based on the locale of the user.

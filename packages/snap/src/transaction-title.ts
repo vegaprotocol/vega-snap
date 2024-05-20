@@ -1,5 +1,5 @@
-import { invalidParameters } from '../errors';
-import type { VegaTransaction } from '../types';
+import { invalidParameters } from './errors';
+import type { VegaTransaction } from './types';
 
 /**
  * Formats a human readable transaction title based on the transaction command.
