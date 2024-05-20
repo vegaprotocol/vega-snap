@@ -269,6 +269,29 @@ export const formatMarketPrice = (
 };
 
 /**
+ * Gets a human readable string representing a market size.
+ *
+ * @param size - The size.
+ * @param marketId - The id of the market.
+ * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
+ * @param formatNumber - Function to format numbers based on the user's locale.
+ * @returns The human readable string.
+ */
+export const formatSize = (
+  size: string,
+  marketId: string,
+  enrichmentData: EnrichmentData,
+  formatNumber: ReturnType<typeof getFormatNumber>,
+) => {
+  const market = getMarketById(enrichmentData, marketId);
+  const decimals = market?.decimalPlaces;
+  if (decimals) {
+    return `${formatNumber(addDecimal(size, Number(decimals)))}`;
+  }
+  return `${size}`;
+};
+
+/**
  * Gets a human readable string representing a market code.
  *
  * @param marketId - The id of the market.
