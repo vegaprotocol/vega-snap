@@ -7,18 +7,16 @@ import {
   prettyPrintOrderAmendment,
   prettyPrintStopOrdersSubmission,
   prettyPrintStopOrdersCancellation,
-  prettyPrintWithdrawSubmission,
-  prettyPrintTransferFunds,
-  prettyPrintCreateReferralSet,
-  prettyPrintUpdateReferralSet,
-  prettyPrintApplyReferralCode,
-  prettyPrintJoinTeam,
-  prettyPrintUpdatePartyProfile,
   prettyPrint,
 } from './transaction-ui/commands';
 import { transactionTitle } from './transaction-ui/transaction-title';
 import type { getFormatNumber } from './transaction-ui/utils';
 import {
+  formatAssetAmount,
+  formatSize,
+  formatTimestamp,
+  getAccountType,
+  getExpiryStrategy,
   getMarginMode,
   getMarketById,
   indentText,
@@ -307,6 +305,342 @@ export function prettyPrintApplyReferralCode(
  */
 export function prettyPrintJoinTeam(tx: VegaTransaction, textFn: typeof text) {
   const elms = [textFn(`Join team: ${minimiseId(tx.id)}`)];
+
+  return elms;
+}
+
+/**
+ * Pretty prints a transfer funds transaction.
+ *
+ * @param tx - The transfer funds transaction.
+ * @param textFn - The text function to be used for rendering.
+ * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
+ * @param formatNumber - Function to format numbers based on the user's locale.
+ * @returns List of snap-ui elements.
+ */
+export function prettyPrintTransferFunds(
+  tx: VegaTransaction,
+  textFn: typeof text,
+  enrichmentData: EnrichmentData,
+  formatNumber: ReturnType<typeof getFormatNumber>,
+) {
+  // handle only oneOff transfer, all others should be
+  // the default prettyPrint
+  if (!tx.oneOff && !tx.kind?.oneOff) {
+    return prettyPrint(tx);
+  }
+
+  const amount = formatAssetAmount(
+    tx.amount,
+    tx.asset,
+    enrichmentData,
+    formatNumber,
+  );
+
+  const elms = [
+    textFn(`**Amount**: ${amount}`),
+    textFn(`**Asset ID**:`),
+    copyable(`${tx.asset}`),
+    textFn(`**To**:`),
+    copyable(`${tx.to}`),
+  ];
+
+  // we do not want to display if it's general account too.
+  if (
+    tx.toAccountType !== undefined &&
+    tx.toAccountType !== null &&
+    tx.toAccountType !== 'ACCOUNT_TYPE_GENERAL' &&
+    tx.toAccountType !== ''
+  ) {
+    elms.push(
+      textFn(`**To Account Type**: ${getAccountType(tx.toAccountType)}`),
+    );
+  }
+
+  if (
+    tx.reference !== undefined &&
+    tx.reference !== null &&
+    tx.reference !== ''
+  ) {
+    elms.push(textFn(`**Reference**: ${tx.reference}`));
+  }
+
+  if (
+    tx.kind?.oneOff?.deliverOn !== null &&
+    tx.kind?.oneOff?.deliverOn !== undefined &&
+    tx.kind?.oneOff?.deliverOn !== BigInt(0)
+  ) {
+    elms.push(
+      textFn(
+        `**Deliver On**: ${formatTimestamp(Number(tx.kind.oneOff.deliverOn))}`,
+      ),
+    );
+  } else if (
+    tx.oneOff?.deliverOn !== null &&
+    tx.oneOff?.deliverOn !== undefined &&
+    tx.oneOff?.deliverOn !== BigInt(0)
+  ) {
+    elms.push(
+      textFn(`**Deliver On**: ${formatTimestamp(Number(tx.oneOff.deliverOn))}`),
+    );
+  }
+
+  return elms;
+}
+
+/**
+ * Pretty prints a windrawal submission.
+ *
+ * @param tx - The transaction to be pretty printed.
+ * @param textFn - The text function to be use for rendering.
+ * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
+ * @param formatNumber - Function to format numbers based on the user's locale.
+ * @returns List of snap-ui elements.
+ */
+export function prettyPrintWithdrawSubmission(
+  tx: VegaTransaction,
+  textFn: typeof text,
+  enrichmentData: EnrichmentData,
+  formatNumber: ReturnType<typeof getFormatNumber>,
+) {
+  const amount = formatAssetAmount(
+    tx.amount,
+    tx.asset,
+    enrichmentData,
+    formatNumber,
+  );
+
+  const elms = [
+    textFn(`**Amount**: ${amount}`),
+    textFn(`**Asset ID**:`),
+    copyable(`${tx.asset}`),
+  ];
+
+  if (tx.ext?.erc20?.receiverAddress) {
+    elms.push(textFn(`**To Address**: `));
+    elms.push(copyable(`${tx.ext?.erc20?.receiverAddress}`));
+  }
+
+  return elms;
+}
+
+/**
+ * Pretty print a Stop Order details.
+ *
+ * @param so - The stop order transaction.
+ * @param textFn - The text function used for rendering.
+ * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
+ * @param formatNumber - Function to format numbers based on the user's locale.
+ * @returns List of snap-ui elements.
+ */
+export function prettyPrintStopOrderDetails(
+  so: VegaTransaction,
+  textFn: typeof text,
+  enrichmentData: EnrichmentData,
+  formatNumber: ReturnType<typeof getFormatNumber>,
+) {
+  const elms = [];
+  if (so.trigger?.price !== null && so.trigger?.price !== undefined) {
+    elms.push(textFn(`Trigger price: ${so.trigger.price}`));
+  }
+
+  if (so.price !== null && so.price !== undefined) {
+    const price = formatMarketPrice(
+      so.price,
+      so.orderSubmission?.marketId,
+      enrichmentData,
+      formatNumber,
+    );
+    elms.push(textFn(`Trigger price: ${price}`));
+  }
+
+  if (
+    so.trigger?.trailingPercentOffset !== null &&
+    so.trigger?.trailingPercentOffset !== undefined
+  ) {
+    const offset = parseFloat(so.trigger.trailingPercentOffset) * 100;
+    elms.push(textFn(`Trailing offset: ${offset}%`));
+  }
+
+  if (
+    so.trailingPercentOffset !== null &&
+    so.trailingPercentOffset !== undefined
+  ) {
+    const offset = parseFloat(so.trigger.trailingPercentOffset) * 100;
+    elms.push(textFn(`Trailing offset: ${offset}%`));
+  }
+
+  if (so.expiresAt !== null && so.expiresAt !== undefined) {
+    elms.push(textFn(`Expires on: ${formatTimestamp(Number(so.expiresAt))}`));
+  }
+
+  if (so.expiryStrategy !== null && so.expiryStrategy !== undefined) {
+    elms.push(
+      textFn(`Expiry strategy: ${getExpiryStrategy(so.expiryStrategy)}`),
+    );
+  }
+
+  return elms;
+}
+
+/**
+ * Pretty print a Stop Orders Submission.
+ *
+ * @param tx - The order submission transaction.
+ * @param textFn - The text function used for rendering.
+ * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
+ * @param formatNumber - Function to format numbers based on the user's locale.
+ * @returns List of snap-ui elements.
+ */
+export function prettyPrintStopOrdersSubmission(
+  tx: VegaTransaction,
+  textFn: typeof text,
+  enrichmentData: EnrichmentData,
+  formatNumber: ReturnType<typeof getFormatNumber>,
+) {
+  const elms = [];
+  if (tx.risesAbove !== null && tx.risesAbove !== undefined) {
+    elms.push(textFn('**Rises Above**'));
+
+    elms.push(
+      ...prettyPrintStopOrderDetails(
+        tx.risesAbove,
+        textFn,
+        enrichmentData,
+        formatNumber,
+      ),
+    );
+
+    elms.push(
+      textFn('**Order details**'),
+      ...prettyPrintTx(
+        { orderSubmission: tx.risesAbove.orderSubmission },
+        indentText,
+        enrichmentData,
+        formatNumber,
+      ),
+    );
+  }
+
+  if (tx.fallsBelow !== null && tx.fallsBelow !== undefined) {
+    if (tx.risesAbove !== null && tx.risesAbove !== undefined) {
+      elms.push(divider());
+    }
+
+    elms.push(textFn('**Falls Below**'));
+
+    elms.push(
+      ...prettyPrintStopOrderDetails(
+        tx.fallsBelow,
+        textFn,
+        enrichmentData,
+        formatNumber,
+      ),
+    );
+
+    elms.push(
+      textFn('**Order details**'),
+      ...prettyPrintTx(
+        { orderSubmission: tx.fallsBelow.orderSubmission },
+        indentText,
+        enrichmentData,
+        formatNumber,
+      ),
+    );
+  }
+
+  return elms;
+}
+
+/**
+ * Pretty print and Order Submission.
+ *
+ * @param tx - The order submission transaction.
+ * @param textFn - The text function used for rendering.
+ * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
+ * @param formatNumber - Function to format numbers based on the user's locale.
+ * @returns List of snap-ui elements.
+ */
+export function prettyPrintOrderSubmission(
+  tx: VegaTransaction,
+  textFn: typeof text,
+  enrichmentData: EnrichmentData,
+  formatNumber: ReturnType<typeof getFormatNumber>,
+) {
+  const elms = [];
+  const isLimit = tx.type === 'TYPE_LIMIT';
+  const side = getSide(tx.side);
+
+  if (tx.peggedOrder && Object.keys(tx.peggedOrder).length !== 0) {
+    const offset = formatMarketPrice(
+      tx.peggedOrder.offset,
+      tx.marketId,
+      enrichmentData,
+      formatNumber,
+    );
+    elms.push(
+      textFn(
+        `Pegged Limit ${side} - ${getTimeInForce(tx.timeInForce)} ${
+          tx.size
+        } @ ${getPeggedReference(tx.peggedOrder.reference)}+${offset}`,
+      ),
+    );
+  } else if (isLimit) {
+    const price = formatMarketPrice(
+      tx.price,
+      tx.marketId,
+      enrichmentData,
+      formatNumber,
+    );
+    elms.push(
+      textFn(
+        `Limit ${side} - ${getTimeInForce(tx.timeInForce)} ${
+          tx.size
+        } @ ${price}`,
+      ),
+    );
+  } else {
+    const size = formatSize(tx.size, tx.marketId, enrichmentData, formatNumber);
+
+    elms.push(
+      textFn(`Market ${side} - ${getTimeInForce(tx.timeInForce)} ${size}`),
+    );
+  }
+  const market = formatMarketCode(tx.marketId, enrichmentData);
+  elms.push(textFn(`**Market**: ${market}`));
+
+  if (tx.expiresAt && tx.expiresAt > BigInt(0)) {
+    elms.push(
+      textFn(`**Expires At**: ${formatTimestamp(Number(tx.expiresAt))}`),
+    );
+  }
+
+  if (tx.postOnly) {
+    elms.push(textFn(`**Post Only**: yes`));
+  }
+
+  if (tx.reduceOnly) {
+    elms.push(textFn(`**Reduce Only**: yes`));
+  }
+
+  if (tx.icebergOpts && Object.keys(tx.icebergOpts).length !== 0) {
+    const peakSize = formatSize(
+      tx.icebergOpts.peakSize,
+      tx.marketId,
+      enrichmentData,
+      formatNumber,
+    );
+    const minimumVisibleSize = formatSize(
+      tx.icebergOpts.minimumVisibleSize,
+      tx.marketId,
+      enrichmentData,
+      formatNumber,
+    );
+    elms.push(textFn(`**Iceberg Peak Size**: ${peakSize}`));
+    elms.push(
+      textFn(`**Iceberg Minimum Visible Size**: ${minimumVisibleSize}`),
+    );
+  }
 
   return elms;
 }
