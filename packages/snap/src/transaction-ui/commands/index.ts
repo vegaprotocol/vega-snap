@@ -2,7 +2,6 @@ import { text, divider } from '@metamask/snaps-sdk';
 import type { getFormatNumber } from '../utils';
 import {
   formatTimestamp,
-  getExpiryStrategy,
   getPeggedReference,
   getSide,
   getTimeInForce,
@@ -16,12 +15,14 @@ import { prettyPrintTransferFunds } from './transfer';
 import { prettyPrint } from './pretty-print';
 import { prettyPrintUpdateMarginMode } from './margin-mode';
 import { prettyPrintWithdrawSubmission } from './withdrawal-submission';
+import { prettyPrintStopOrdersSubmission } from './stop-orders-submission';
 
 export {
   prettyPrintTransferFunds,
   prettyPrintUpdateMarginMode,
   prettyPrintWithdrawSubmission,
   prettyPrint,
+  prettyPrintStopOrdersSubmission,
 };
 
 /**
@@ -171,107 +172,6 @@ export function prettyPrintApplyReferralCode(
  */
 export function prettyPrintJoinTeam(tx: VegaTransaction, textFn: typeof text) {
   const elms = [textFn(`Join team: ${minimiseId(tx.id)}`)];
-
-  return elms;
-}
-
-/**
- * Pretty print a Stop Order details.
- *
- * @param so - The stop order details.
- * @param textFn - The text function used for rendering.
- * @returns List of snap-ui elements.
- */
-export function prettyPrintStopOrderDetails(so: any, textFn: typeof text) {
-  const elms = [];
-  if (so.trigger?.price !== null && so.trigger?.price !== undefined) {
-    elms.push(textFn(`Trigger price: ${so.trigger.price}`));
-  }
-
-  if (so.price !== null && so.price !== undefined) {
-    elms.push(textFn(`Trigger price: ${so.price}`));
-  }
-
-  if (
-    so.trigger?.trailingPercentOffset !== null &&
-    so.trigger?.trailingPercentOffset !== undefined
-  ) {
-    const offset = parseFloat(so.trigger.trailingPercentOffset) * 100;
-    elms.push(textFn(`Trailing offset: ${offset}%`));
-  }
-
-  if (
-    so.trailingPercentOffset !== null &&
-    so.trailingPercentOffset !== undefined
-  ) {
-    const offset = parseFloat(so.trigger.trailingPercentOffset) * 100;
-    elms.push(textFn(`Trailing offset: ${offset}%`));
-  }
-
-  if (so.expiresAt !== null && so.expiresAt !== undefined) {
-    elms.push(textFn(`Expires on: ${formatTimestamp(Number(so.expiresAt))}`));
-  }
-
-  if (so.expiryStrategy !== null && so.expiryStrategy !== undefined) {
-    elms.push(
-      textFn(`Expiry strategy: ${getExpiryStrategy(so.expiryStrategy)}`),
-    );
-  }
-
-  return elms;
-}
-
-/**
- * Pretty print a Stop Orders Submission.
- *
- * @param tx - The order submission transaction.
- * @param textFn - The text function used for rendering.
- * @param enrichmentData - Data used to enrich the transaction data to make it more human readable.
- * @param formatNumber - Function to format numbers based on the user's locale.
- * @returns List of snap-ui elements.
- */
-export function prettyPrintStopOrdersSubmission(
-  tx: VegaTransaction,
-  textFn: typeof text,
-  enrichmentData: EnrichmentData,
-  formatNumber: ReturnType<typeof getFormatNumber>,
-) {
-  const elms = [];
-  if (tx.risesAbove !== null && tx.risesAbove !== undefined) {
-    elms.push(textFn('**Rises Above**'));
-
-    elms.push(...prettyPrintStopOrderDetails(tx.risesAbove, textFn));
-
-    elms.push(
-      textFn('**Order details**'),
-      ...prettyPrintTx(
-        { orderSubmission: tx.risesAbove.orderSubmission },
-        indentText,
-        enrichmentData,
-        formatNumber,
-      ),
-    );
-  }
-
-  if (tx.fallsBelow !== null && tx.fallsBelow !== undefined) {
-    if (tx.risesAbove !== null && tx.risesAbove !== undefined) {
-      elms.push(divider());
-    }
-
-    elms.push(textFn('**Falls Below**'));
-
-    elms.push(...prettyPrintStopOrderDetails(tx.fallsBelow, textFn));
-
-    elms.push(
-      textFn('**Order details**'),
-      ...prettyPrintTx(
-        { orderSubmission: tx.fallsBelow.orderSubmission },
-        indentText,
-        enrichmentData,
-        formatNumber,
-      ),
-    );
-  }
 
   return elms;
 }
