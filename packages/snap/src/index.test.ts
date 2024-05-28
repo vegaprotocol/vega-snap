@@ -443,7 +443,9 @@ describe('onRpcRequest', () => {
     });
 
     // This assertion is definitely implementation specific, but it guards the next assertion
-    expect(httpHandler).toHaveBeenCalledTimes(1);
+    expect(httpHandler).toHaveBeenCalledTimes(3);
+    expect(httpHandler).toHaveBeenCalledWith('/api/v2/assets');
+    expect(httpHandler).toHaveBeenCalledWith('/api/v2/markets');
     expect(httpHandler).toHaveBeenCalledWith('/blockchain/height');
 
     // This is what we really want to guard against
