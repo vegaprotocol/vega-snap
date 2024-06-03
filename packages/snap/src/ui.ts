@@ -569,6 +569,12 @@ export function prettyPrintOrderSubmission(
   const side = getSide(tx.side);
 
   if (tx.peggedOrder && Object.keys(tx.peggedOrder).length !== 0) {
+    const formattedSize = formatSize(
+      tx.size,
+      tx.marketId,
+      enrichmentData,
+      formatNumber,
+    );
     const offset = formatMarketPrice(
       tx.peggedOrder.offset,
       tx.marketId,
@@ -577,12 +583,20 @@ export function prettyPrintOrderSubmission(
     );
     elms.push(
       textFn(
-        `Pegged Limit ${side} - ${getTimeInForce(tx.timeInForce)} ${
-          tx.size
-        } @ ${getPeggedReference(tx.peggedOrder.reference)}+${offset}`,
+        `Pegged Limit ${side} - ${getTimeInForce(
+          tx.timeInForce,
+        )} ${formattedSize} @ ${getPeggedReference(
+          tx.peggedOrder.reference,
+        )}+${offset}`,
       ),
     );
   } else if (isLimit) {
+    const formattedSize = formatSize(
+      tx.size,
+      tx.marketId,
+      enrichmentData,
+      formatNumber,
+    );
     const price = formatMarketPrice(
       tx.price,
       tx.marketId,
@@ -591,9 +605,9 @@ export function prettyPrintOrderSubmission(
     );
     elms.push(
       textFn(
-        `Limit ${side} - ${getTimeInForce(tx.timeInForce)} ${
-          tx.size
-        } @ ${price}`,
+        `Limit ${side} - ${getTimeInForce(
+          tx.timeInForce,
+        )} ${formattedSize} @ ${price}`,
       ),
     );
   } else {
