@@ -11,7 +11,6 @@ import {
   getAccountType,
   getExpiryStrategy,
   getMarginMode,
-  getMarketById,
   getPeggedReference,
   getSide,
   getTimeInForce,
@@ -140,10 +139,9 @@ export function prettyPrintUpdateMarginMode(
   if (marketId === '') {
     marketId = 'Invalid market';
   }
-  const market = getMarketById(enrichmentData, tx.asset);
-  const code = market?.tradableInstrument?.instrument?.code;
-  const elms = code
-    ? [textFn(`Update market **${code}** margin mode to **${mode}**`)]
+  const market = formatMarketCode(tx.marketId, enrichmentData);
+  const elms = market
+    ? [textFn(`Update market **${market}** margin mode to **${mode}**`)]
     : [textFn(`Update market **${marketId}** margin mode to **${mode}**`)];
 
   if (mode === 'Isolated margin') {
