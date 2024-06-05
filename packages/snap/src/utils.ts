@@ -284,7 +284,7 @@ export const formatSize = (
   formatNumber: ReturnType<typeof getFormatNumber>,
 ) => {
   const market = getMarketById(enrichmentData, marketId);
-  const decimals = market?.decimalPlaces;
+  const decimals = market?.positionDecimalPlaces;
   if (decimals) {
     return `${formatNumber(addDecimal(size.toString(), Number(decimals)))}`;
   }
