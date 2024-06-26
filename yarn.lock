@@ -8415,10 +8415,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vegaprotocol/rest-clients@npm:^0.0.5":
-  version: 0.0.5
-  resolution: "@vegaprotocol/rest-clients@npm:0.0.5"
-  checksum: 0f8247490c2025a53d6f928a1f9a2a1be7c8fda9b1637e75ad9428697532cb06d77b2415d7227d4e3032e50664f0628cf0393aab25cd70e9836a2ea2e560cdf1
+"@vegaprotocol/rest-clients@npm:^0.0.6":
+  version: 0.0.6
+  resolution: "@vegaprotocol/rest-clients@npm:0.0.6"
+  checksum: 2e6febd80f5bc492628993f15a151378f5178ae93f9194149340a871e0f5945872450281bf73502c339622d491532d06e6abe27d266801d7f7ffc6bba9a28cb6
   languageName: node
   linkType: hard
 
@@ -8466,7 +8466,7 @@ __metadata:
     "@typescript-eslint/parser": ^5.33.0
     "@vegaprotocol/crypto": ^0.11.0
     "@vegaprotocol/protos": ^0.19.0
-    "@vegaprotocol/rest-clients": ^0.0.5
+    "@vegaprotocol/rest-clients": ^0.0.6
     buffer: ^6.0.3
     eslint: ^8.21.0
     eslint-config-prettier: ^8.1.0
